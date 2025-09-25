@@ -1,3 +1,4 @@
+import 'package:budaya_indonesia/common/theme/app_theme.dart';
 import 'package:budaya_indonesia/features/navbar/pages/bottom_navbar.dart';
 import 'package:budaya_indonesia/features/navbar/providers/navbar_provider.dart';
 import 'package:budaya_indonesia/features/home/pages/home_page.dart';
@@ -40,10 +41,9 @@ class _MainAppState extends State<MainApp> {
             create: (_) => LoginProvider(auth: context.read<AuthProvider>()),
             child: MaterialApp(
               debugShowCheckedModeBanner: false,
-              theme: ThemeData(
-                useMaterial3: true,
-                colorSchemeSeed: Colors.indigo,
-              ),
+              theme: AppTheme.light,
+              darkTheme: AppTheme.dark,
+              themeMode: ThemeMode.light,
               home: Consumer<AuthProvider>(
                 builder: (context, auth, _) {
                   if (auth.user == null) return const LoginPages();
