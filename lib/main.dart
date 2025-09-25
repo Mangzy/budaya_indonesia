@@ -1,3 +1,5 @@
+import 'package:budaya_indonesia/features/navbar/pages/bottom_navbar.dart';
+import 'package:budaya_indonesia/features/navbar/providers/navbar_provider.dart';
 import 'package:budaya_indonesia/features/home/pages/home_page.dart';
 import 'package:budaya_indonesia/features/login/pages/login_pages.dart';
 import 'package:budaya_indonesia/features/login/providers/login_provider.dart';
@@ -15,9 +17,14 @@ void main() async {
   runApp(const MainApp());
 }
 
-class MainApp extends StatelessWidget {
+class MainApp extends StatefulWidget {
   const MainApp({super.key});
 
+  @override
+  State<MainApp> createState() => _MainAppState();
+}
+
+class _MainAppState extends State<MainApp> {
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
@@ -25,10 +32,10 @@ class MainApp extends StatelessWidget {
         ChangeNotifierProvider(
           create: (_) => AuthProvider()..listenAuthState(),
         ),
+        ChangeNotifierProvider(create: (_) => NavbarProvider()),
       ],
       child: Builder(
         builder: (context) {
-          // Create LoginProvider now that AuthProvider is available in this context
           return ChangeNotifierProvider(
             create: (_) => LoginProvider(auth: context.read<AuthProvider>()),
             child: MaterialApp(
@@ -39,9 +46,8 @@ class MainApp extends StatelessWidget {
               ),
               home: Consumer<AuthProvider>(
                 builder: (context, auth, _) {
-                  return auth.user == null
-                      ? const LoginPages()
-                      : const HomeScreen();
+                  if (auth.user == null) return const LoginPages();
+                  return const BottomNavbar();
                 },
               ),
               routes: {
