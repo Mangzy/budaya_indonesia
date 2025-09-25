@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../register/widgets/primary_button.dart';
+import '../widgets/auth_text_field.dart';
 import '../providers/register_provider.dart';
 import '../../../src/auth_provider.dart';
 
@@ -47,32 +48,26 @@ class _RegisterPageState extends State<RegisterPage> {
                         child: Column(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            TextFormField(
+                            RegisterAuthTextField(
                               controller: _nameCtrl,
-                              decoration: const InputDecoration(
-                                labelText: 'Full name',
-                              ),
+                              label: 'Full name',
                               validator: (v) => (v ?? '').isNotEmpty
                                   ? null
                                   : 'Enter your name',
                             ),
                             const SizedBox(height: 12),
-                            TextFormField(
+                            RegisterAuthTextField(
                               controller: _emailCtrl,
-                              decoration: const InputDecoration(
-                                labelText: 'Email',
-                              ),
+                              label: 'Email',
                               validator: (v) => (v ?? '').contains('@')
                                   ? null
                                   : 'Enter a valid email',
                             ),
                             const SizedBox(height: 12),
-                            TextFormField(
+                            RegisterAuthTextField(
                               controller: _passCtrl,
-                              decoration: const InputDecoration(
-                                labelText: 'Password',
-                              ),
-                              obscureText: true,
+                              label: 'Password',
+                              obscure: true,
                               validator: (v) =>
                                   (v ?? '').length >= 6 ? null : 'Min 6 chars',
                             ),

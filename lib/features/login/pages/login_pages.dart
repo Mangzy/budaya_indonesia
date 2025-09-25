@@ -170,47 +170,10 @@ class _LoginPagesState extends State<LoginPages> {
                           child: const Text('Forgot password'),
                         ),
                         TextButton(
-                          onPressed: vm.loadingSignUpWithEmail
-                              ? null
-                              : () async {
-                                  final email = vm.model.email.trim();
-                                  final pass = vm.model.password;
-                                  if (email.contains('@') && pass.length >= 6) {
-                                    try {
-                                      await vm.signUpWithEmail();
-                                      if (!mounted) return;
-                                      ScaffoldMessenger.of(
-                                        // ignore: use_build_context_synchronously
-                                        context,
-                                      ).showSnackBar(
-                                        const SnackBar(
-                                          content: Text('Account created'),
-                                        ),
-                                      );
-                                    } catch (e) {
-                                      ScaffoldMessenger.of(
-                                        // ignore: use_build_context_synchronously
-                                        context,
-                                      ).showSnackBar(
-                                        SnackBar(content: Text(e.toString())),
-                                      );
-                                    }
-                                  } else {
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      const SnackBar(
-                                        content: Text(
-                                          'Fill valid email and password',
-                                        ),
-                                      ),
-                                    );
-                                  }
-                                },
-                          child: InkWell(
-                            onTap: () {
-                              Navigator.pushNamed(context, '/register');
-                            },
-                            child: const Text('Create account'),
-                          ),
+                          onPressed: () {
+                            Navigator.pushNamed(context, '/register');
+                          },
+                          child: const Text('Create account'),
                         ),
                       ],
                     ),
