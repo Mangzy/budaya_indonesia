@@ -1,4 +1,5 @@
 import 'package:budaya_indonesia/features/home/pages/home_page.dart';
+import 'package:budaya_indonesia/features/music/pages/music_page.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/navbar_provider.dart';
@@ -29,13 +30,8 @@ class _BottomNavbarState extends State<BottomNavbar> {
 
   final List<Widget> _pages = [
     // Home
-    HomeScreen(),
-    // AR (placeholder)
-    Scaffold(
-      appBar: AppBar(title: const Text('Audio')),
-      body: const Center(child: Text('Audio page')),
-    ),
-    // Quiz
+    HomePage(),
+    MusicPage(),
     Scaffold(
       appBar: AppBar(title: const Text('AR')),
       body: const Center(child: Text('AR page (placeholder)')),
@@ -44,7 +40,6 @@ class _BottomNavbarState extends State<BottomNavbar> {
       appBar: AppBar(title: const Text('Quiz')),
       body: const Center(child: Text('Quiz page')),
     ),
-    // Profile
     Scaffold(
       appBar: AppBar(title: const Text('Profile')),
       body: const Center(child: Text('Profile page')),
@@ -52,7 +47,6 @@ class _BottomNavbarState extends State<BottomNavbar> {
   ];
   void _onItemTapped(int index) {
     setState(() => _selectedIndex = index);
-    // if parent provided onTap use it, otherwise use provider
     if (widget.onTap != null) {
       widget.onTap!(index);
     } else {
@@ -106,6 +100,7 @@ class _BottomNavbarState extends State<BottomNavbar> {
                                   ? Theme.of(context).colorScheme.onPrimary
                                   : Theme.of(
                                       context,
+                                      // ignore: deprecated_member_use
                                     ).colorScheme.onPrimary.withOpacity(0.85),
                             ),
                             const SizedBox(height: 4),
@@ -117,6 +112,7 @@ class _BottomNavbarState extends State<BottomNavbar> {
                                     ? Theme.of(context).colorScheme.onPrimary
                                     : Theme.of(
                                         context,
+                                        // ignore: deprecated_member_use
                                       ).colorScheme.onPrimary.withOpacity(0.85),
                               ),
                             ),

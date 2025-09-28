@@ -33,6 +33,7 @@ class RegisterAuthTextField extends StatelessWidget {
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide: BorderSide(
+            // ignore: deprecated_member_use
             color: Theme.of(context).colorScheme.primary.withOpacity(0.15),
           ),
         ),
