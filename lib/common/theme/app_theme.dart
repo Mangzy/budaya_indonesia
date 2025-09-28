@@ -18,7 +18,29 @@ class AppTheme {
     floatingActionButtonTheme: FloatingActionButtonThemeData(
       backgroundColor: AppColors.accent,
     ),
-    iconTheme: IconThemeData(color: AppColors.primary),
+    iconTheme: IconThemeData(
+      color: Color.alphaBlend(Colors.black.withOpacity(.35), AppColors.primary),
+    ),
+    switchTheme: SwitchThemeData(
+      thumbColor: MaterialStateProperty.resolveWith((states) {
+        if (states.contains(MaterialState.selected)) {
+          return AppColors.primary;
+        }
+        return Colors.white;
+      }),
+      trackColor: MaterialStateProperty.resolveWith((states) {
+        if (states.contains(MaterialState.selected)) {
+          return AppColors.primary.withOpacity(0.55);
+        }
+        return Colors.grey.shade300;
+      }),
+      trackOutlineColor: MaterialStateProperty.resolveWith((states) {
+        if (states.contains(MaterialState.selected)) {
+          return AppColors.primary.withOpacity(0.8);
+        }
+        return Colors.grey.shade400;
+      }),
+    ),
     buttonTheme: ButtonThemeData(
       buttonColor: AppColors.primary,
       textTheme: ButtonTextTheme.primary,
@@ -42,6 +64,18 @@ class AppTheme {
       backgroundColor: AppColors.accent,
     ),
     iconTheme: IconThemeData(color: AppColors.primary),
+    switchTheme: SwitchThemeData(
+      thumbColor: MaterialStateProperty.resolveWith((states) {
+        if (states.contains(MaterialState.selected)) return AppColors.accent;
+        return Colors.grey.shade400;
+      }),
+      trackColor: MaterialStateProperty.resolveWith((states) {
+        if (states.contains(MaterialState.selected))
+          return AppColors.accent.withOpacity(.5);
+        return Colors.grey.shade700;
+      }),
+      trackOutlineColor: MaterialStateProperty.all(Colors.transparent),
+    ),
     buttonTheme: ButtonThemeData(
       buttonColor: AppColors.primary,
       textTheme: ButtonTextTheme.primary,

@@ -1,5 +1,6 @@
 import 'package:budaya_indonesia/features/home/pages/home_page.dart';
 import 'package:budaya_indonesia/features/music/pages/music_page.dart';
+import 'package:budaya_indonesia/features/profile/pages/profile_page.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/navbar_provider.dart';
@@ -40,10 +41,7 @@ class _BottomNavbarState extends State<BottomNavbar> {
       appBar: AppBar(title: const Text('Quiz')),
       body: const Center(child: Text('Quiz page')),
     ),
-    Scaffold(
-      appBar: AppBar(title: const Text('Profile')),
-      body: const Center(child: Text('Profile page')),
-    ),
+    ProfilePage(),
   ];
   void _onItemTapped(int index) {
     setState(() => _selectedIndex = index);
