@@ -1,15 +1,27 @@
 name: budaya_indonesia
 description: "A new Flutter project."
-publish_to: 'none'
+publish_to: "none"
 version: 0.1.0
 
 environment:
   sdk: ^3.8.1
 
 dependencies:
+  cupertino_icons: ^1.0.8
+  firebase_auth: ^6.1.0
+  firebase_core: ^4.1.1
   flutter:
     sdk: flutter
-  google_fonts: ^6.3.1
+  shared_preferences: ^2.3.2
+  google_fonts: ^6.3.2
+  google_sign_in: ^7.2.0
+  just_audio: ^0.9.40
+  provider: ^6.1.5+1
+  rive: ^0.13.20
+  rive_animated_icon: ^2.0.5
+  supabase_flutter: ^2.10.1
+  http: ^1.2.1
+  image_picker: ^1.1.2
 
 dev_dependencies:
   flutter_test:
