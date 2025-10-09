@@ -4,6 +4,7 @@ import 'package:budaya_indonesia/features/music/pages/music_page.dart';
 import 'package:budaya_indonesia/features/music_detail/pages/music_detail_page.dart'
     as detail;
 import 'package:budaya_indonesia/features/music_detail/providers/music_provider.dart'
+    // ignore: library_prefixes
     as detailProv;
 import 'package:budaya_indonesia/features/navbar/pages/bottom_navbar.dart';
 import 'package:budaya_indonesia/features/navbar/providers/navbar_provider.dart';

@@ -6,7 +6,8 @@ class AppTheme {
   static ThemeData light = ThemeData(
     brightness: Brightness.light,
     primaryColor: AppColors.primary,
-    fontFamily: GoogleFonts.roboto().fontFamily,
+    fontFamily: GoogleFonts.montserrat().fontFamily,
+    textTheme: GoogleFonts.montserratTextTheme(),
     colorScheme: ColorScheme.fromSwatch(
       primarySwatch: Colors.teal,
     ).copyWith(primary: AppColors.primary, secondary: AppColors.accent),
@@ -50,7 +51,8 @@ class AppTheme {
   static ThemeData dark = ThemeData(
     brightness: Brightness.dark,
     primaryColor: AppColors.primary,
-    fontFamily: GoogleFonts.roboto().fontFamily,
+    fontFamily: GoogleFonts.montserrat().fontFamily,
+    textTheme: GoogleFonts.montserratTextTheme(ThemeData.dark().textTheme),
     colorScheme: ColorScheme.fromSwatch(
       primarySwatch: Colors.teal,
       brightness: Brightness.dark,

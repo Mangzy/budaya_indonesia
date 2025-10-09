@@ -1,4 +1,5 @@
 import 'dart:developer' as dev;
+import 'dart:async';
 import 'package:budaya_indonesia/features/profile/models/profile_model.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -13,18 +14,39 @@ class ProfileProvider extends ChangeNotifier {
   bool _loading = false;
   String? _error;
 
+  StreamSubscription<User?>? _authSub;
+
   ProfileProvider({FirebaseAuth? auth})
     : _auth = auth ?? FirebaseAuth.instance {
-    load();
+    // Awal: tandai masih loading sampai event auth pertama datang
+    _loading = true;
+    _authSub = _auth.authStateChanges().listen((user) {
+      if (user == null) {
+        _profile = null;
+        _loading = false;
+        notifyListeners();
+      } else {
+        // user tersedia -> muat profil
+        load(force: true);
+      }
+    });
   }
 
   UserProfile? get profile => _profile;
   bool get isLoading => _loading;
   String? get error => _error;
 
-  Future<void> load() async {
+  Future<void> load({bool force = false}) async {
     final user = _auth.currentUser;
-    if (user == null) return;
+    if (user == null) {
+      if (force) {
+        _profile = null;
+        _loading = false;
+        notifyListeners();
+      }
+      return;
+    }
+    if (_loading && !force) return; // hindari double load
     _loading = true;
     _error = null;
     notifyListeners();
@@ -34,7 +56,7 @@ class ProfileProvider extends ChangeNotifier {
       _profile = UserProfile(
         id: user.uid,
         name: user.displayName ?? 'Pengguna',
-        username: user.displayName, // sementara samakan
+        username: user.displayName,
         email: user.email,
         photoUrl: user.photoURL,
         darkMode: dark,
@@ -136,5 +158,11 @@ class ProfileProvider extends ChangeNotifier {
         stackTrace: st,
       );
     }
+  }
+
+  @override
+  void dispose() {
+    _authSub?.cancel();
+    super.dispose();
   }
 }

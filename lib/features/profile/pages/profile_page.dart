@@ -250,6 +250,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                           if (!_formKey.currentState!.validate()) return;
                           await prov.updateName(_name.text.trim());
                           await prov.updateUsername(_username.text.trim());
+                          // ignore: use_build_context_synchronously
                           if (mounted) Navigator.pop(context);
                         },
                   child: const Text('Simpan'),

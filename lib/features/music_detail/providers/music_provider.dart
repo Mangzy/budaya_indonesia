@@ -500,9 +500,8 @@ class MusicDetailProvider extends ChangeNotifier {
       await _player.play();
       dev.log('Playing ${track.id}', name: 'MusicDetailProvider');
       notifyListeners();
-    } catch (e) {
-      // TODO: Bisa set error khusus player
-    }
+      // ignore: empty_catches
+    } catch (e) {}
   }
 
   Future<void> togglePlay(MusicTrackDetail track) async {
