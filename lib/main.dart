@@ -22,6 +22,7 @@ import 'package:budaya_indonesia/src/auth_provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'dart:developer' as dev;
 import 'firebase_options.dart';
+import 'features/home/providers/pakaian_provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -74,6 +75,10 @@ class _MainAppState extends State<MainApp> {
             isPublicBucket: true,
             allowedExtensions: ['.mp3'],
           ),
+        ),
+        ChangeNotifierProvider(
+          create: (_) =>
+              PakaianProvider(client: Supabase.instance.client)..refresh(),
         ),
       ],
       child: Builder(
