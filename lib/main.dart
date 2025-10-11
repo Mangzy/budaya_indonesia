@@ -1,4 +1,6 @@
 import 'package:budaya_indonesia/common/theme/app_theme.dart';
+import 'package:budaya_indonesia/features/ar/pages/ar_page.dart';
+import 'package:budaya_indonesia/features/ar/providers/ar_provider.dart';
 import 'package:budaya_indonesia/features/music/pages/music_page.dart';
 // legacy music detail (deprecated) imports removed
 import 'package:budaya_indonesia/features/music_detail/pages/music_detail_page.dart'
@@ -74,6 +76,7 @@ class _MainAppState extends State<MainApp> {
             allowedExtensions: ['.mp3'],
           ),
         ),
+        ChangeNotifierProvider(create: (_) => ArProvider()),
       ],
       child: Builder(
         builder: (context) {
@@ -109,6 +112,7 @@ class _MainAppState extends State<MainApp> {
                     },
                     '/profile': (context) => const ProfilePage(),
                     '/profile/edit': (context) => const EditProfilePage(),
+                    '/ar': (context) => const ArPage(),
                   },
                 );
               },
