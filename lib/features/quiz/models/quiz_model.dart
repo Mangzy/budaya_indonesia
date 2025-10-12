@@ -10,9 +10,9 @@ class QuizQuestion {
   final int id;
   final String category;
   final String question;
-  final List<String> options; // 4 pilihan jawaban
-  final String correctAnswer; // jawaban benar (full text)
-  final String? imageUrl; // optional, hanya untuk pakaian
+  final List<String> options;
+  final String correctAnswer;
+  final String? imageUrl;
 
   const QuizQuestion({
     required this.id,
@@ -98,7 +98,7 @@ class QuizResult {
   final int totalQuestions;
   final int correctAnswers;
   final int wrongAnswers;
-  final int totalScore; // benar * 10
+  final int totalScore;
   final double scorePercentage;
   final Duration timeTaken;
   final DateTime completedAt;

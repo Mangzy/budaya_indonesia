@@ -16,15 +16,14 @@ class QuizProvider extends ChangeNotifier {
   ResultState<List<QuizQuestion>> _state = ResultState.none();
   List<QuizQuestion> _questions = [];
   Map<int, int> _userAnswers = {};
-  Map<int, bool> _submittedAnswers =
-      {}; // Track which answers have been checked
+  Map<int, bool> _submittedAnswers = {};
   int _currentQuestionIndex = 0;
   DateTime? _quizStartTime;
   bool _isQuizCompleted = false;
   QuizResult? _lastResult;
   QuizCategory? _selectedCategory;
   Duration _remainingTime = const Duration(minutes: 5);
-  int _confirmedScore = 0; // Score yang sudah dikonfirmasi (setelah klik Next)
+  int _confirmedScore = 0;
 
   ResultState<List<QuizQuestion>> get state => _state;
   List<QuizQuestion> get questions => _questions;
@@ -33,9 +32,8 @@ class QuizProvider extends ChangeNotifier {
   QuizResult? get lastResult => _lastResult;
   QuizCategory? get selectedCategory => _selectedCategory;
   Duration get remainingTime => _remainingTime;
-  int get confirmedScore => _confirmedScore; // Score yang ditampilkan
-  bool get isTimerWarning =>
-      _remainingTime.inSeconds < 60; // Warning jika < 1 menit
+  int get confirmedScore => _confirmedScore;
+  bool get isTimerWarning => _remainingTime.inSeconds < 60;
 
   QuizQuestion? get currentQuestion {
     if (_currentQuestionIndex >= _questions.length) return null;
@@ -158,12 +156,12 @@ class QuizProvider extends ChangeNotifier {
 
   bool submitCurrentAnswer() {
     if (_submittedAnswers[_currentQuestionIndex] == true) {
-      return false; // Already submitted
+      return false;
     }
 
     final userAnswer = _userAnswers[_currentQuestionIndex];
     if (userAnswer == null) {
-      return false; // No answer selected
+      return false;
     }
 
     final question = _questions[_currentQuestionIndex];
@@ -302,7 +300,6 @@ class QuizProvider extends ChangeNotifier {
     _quizStartTime = null;
     _isQuizCompleted = false;
     _lastResult = null;
-    // _selectedCategory tetap ada untuk retry
 
     dev.log('Quiz state reset', name: 'QuizProvider');
     notifyListeners();
