@@ -22,6 +22,8 @@ class _ArGuideContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final textTheme = Theme.of(context).textTheme;
+
     return Container(
       decoration: BoxDecoration(
         color: Colors.teal.shade50,
@@ -34,6 +36,7 @@ class _ArGuideContent extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+
             Center(
               child: Container(
                 width: 60,
@@ -46,10 +49,10 @@ class _ArGuideContent extends StatelessWidget {
               ),
             ),
 
-            const Center(
+            Center(
               child: Text(
                 "Panduan Pengambilan Gambar",
-                style: TextStyle(
+                style: textTheme.titleMedium?.copyWith(
                   fontSize: 18,
                   fontWeight: FontWeight.w700,
                   color: Colors.teal,
@@ -60,15 +63,16 @@ class _ArGuideContent extends StatelessWidget {
             const SizedBox(height: 24),
 
             Padding(
-              padding: const EdgeInsets.only(left: 15), 
+              padding: const EdgeInsets.only(left: 15),
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
+                  Text(
                     "1.",
-                    style: TextStyle(
+                    style: textTheme.bodyMedium?.copyWith(
                       fontSize: 16,
                       color: Colors.teal,
+                      fontWeight: FontWeight.w500,
                     ),
                   ),
                   const SizedBox(width: 6),
@@ -76,9 +80,9 @@ class _ArGuideContent extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text(
+                        Text(
                           "Posisikan tubuh sejajar dengan kamera",
-                          style: TextStyle(
+                          style: textTheme.bodyMedium?.copyWith(
                             fontSize: 16,
                             color: Colors.teal,
                           ),
@@ -111,18 +115,19 @@ class _ArGuideContent extends StatelessWidget {
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
+                  Text(
                     "2.",
-                    style: TextStyle(
+                    style: textTheme.bodyMedium?.copyWith(
                       fontSize: 16,
                       color: Colors.teal,
+                      fontWeight: FontWeight.w500,
                     ),
                   ),
                   const SizedBox(width: 6),
-                  const Expanded(
+                  Expanded(
                     child: Text(
                       "Abadikan foto anda sesuai pakaian adat yang anda pilih",
-                      style: TextStyle(
+                      style: textTheme.bodyMedium?.copyWith(
                         fontSize: 16,
                         color: Colors.teal,
                       ),
@@ -155,6 +160,8 @@ class _GuideBox extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final textTheme = Theme.of(context).textTheme;
+
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       decoration: BoxDecoration(
@@ -173,10 +180,10 @@ class _GuideBox extends StatelessWidget {
           const SizedBox(width: 8),
           Text(
             label,
-            style: const TextStyle(
+            style: textTheme.bodyMedium?.copyWith(
               color: Colors.white,
               fontSize: 14,
-              fontWeight: FontWeight.w500,
+              fontWeight: FontWeight.w600,
             ),
           ),
           const SizedBox(width: 8),
