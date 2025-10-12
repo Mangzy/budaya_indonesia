@@ -1,10 +1,3 @@
-/// Quiz Models untuk Budaya Indonesia
-///
-/// Mendukung 2 kategori quiz:
-/// - Pakaian Daerah (dengan gambar)
-/// - Lagu Daerah (tanpa gambar)
-
-/// Enum untuk kategori quiz
 enum QuizCategory {
   pakaian('Pakaian Daerah'),
   lagu('Lagu Daerah');
@@ -13,14 +6,13 @@ enum QuizCategory {
   const QuizCategory(this.displayName);
 }
 
-/// Model untuk pertanyaan quiz
 class QuizQuestion {
   final int id;
   final String category;
   final String question;
   final List<String> options; // 4 pilihan jawaban
-  final String correctAnswer; // Jawaban benar (full text)
-  final String? imageUrl; // Optional, hanya untuk pakaian
+  final String correctAnswer; // jawaban benar (full text)
+  final String? imageUrl; // optional, hanya untuk pakaian
 
   const QuizQuestion({
     required this.id,
@@ -31,60 +23,40 @@ class QuizQuestion {
     this.imageUrl,
   });
 
-  /// Factory constructor dari Supabase response
-  ///
-  /// Format Supabase:
-  /// {
-  ///   "id": 1,
-  ///   "kategori": "lagu",
-  ///   "question": "Lagu Ampar-Ampar Pisang berasal dari…",
-  ///   "options": "Kalimantan Selatan|Kalimantan Barat|...",
-  ///   "answer": "Kalimantan Selatan",
-  ///   "image_url": null
-  /// }
-  factory QuizQuestion.fromJson(Map<String, dynamic> json) {
-    // Parse options dari format "Option1|Option2|Option3|Option4"
-    final optionsString = json['options'] as String? ?? '';
+  factory QuizQuestion.fromMap(Map<String, dynamic> map) {
+    final optionsString = map['opsi'] as String? ?? '';
     final optionsList = optionsString.split('|').map((e) => e.trim()).toList();
 
     return QuizQuestion(
-      id: json['id'] as int,
-      category: json['kategori'] as String? ?? '',
-      question: json['question'] as String? ?? '',
+      id: map['id'] as int,
+      category: map['kategori'] as String? ?? '',
+      question: map['pertanyaan'] as String? ?? '',
       options: optionsList,
-      correctAnswer: (json['answer'] as String? ?? '').trim(),
-      imageUrl: json['image_url'] as String?,
+      correctAnswer: (map['jawaban'] as String? ?? '').trim(),
+      imageUrl: map['image_url'] as String?,
     );
   }
 
-  /// Convert ke JSON
-  Map<String, dynamic> toJson() {
+  Map<String, dynamic> toMap() {
     return {
       'id': id,
       'kategori': category,
-      'question': question,
-      'options': options.join('|'),
-      'answer': correctAnswer,
+      'pertanyaan': question,
+      'opsi': options.join('|'),
+      'jawaban': correctAnswer,
       'image_url': imageUrl,
     };
   }
 
-  /// Check apakah jawaban user benar
-  ///
-  /// [userAnswer] bisa berupa:
-  /// - Index (0-3)
-  /// - Full text jawaban
   bool isCorrect(dynamic userAnswer) {
     if (userAnswer == null) return false;
 
-    // Jika userAnswer adalah index
     if (userAnswer is int) {
       if (userAnswer < 0 || userAnswer >= options.length) return false;
       return options[userAnswer].trim().toLowerCase() ==
           correctAnswer.trim().toLowerCase();
     }
 
-    // Jika userAnswer adalah string
     if (userAnswer is String) {
       return userAnswer.trim().toLowerCase() ==
           correctAnswer.trim().toLowerCase();
@@ -93,7 +65,6 @@ class QuizQuestion {
     return false;
   }
 
-  /// Get index dari correct answer
   int? get correctAnswerIndex {
     for (int i = 0; i < options.length; i++) {
       if (options[i].trim().toLowerCase() ==
@@ -112,7 +83,6 @@ class QuizQuestion {
   @override
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
-
     return other is QuizQuestion &&
         other.id == id &&
         other.category == category &&
@@ -123,13 +93,12 @@ class QuizQuestion {
   int get hashCode => id.hashCode ^ category.hashCode ^ question.hashCode;
 }
 
-/// Model untuk hasil quiz
 class QuizResult {
   final QuizCategory category;
   final int totalQuestions;
   final int correctAnswers;
   final int wrongAnswers;
-  final int totalScore; // Benar * 10
+  final int totalScore; // benar * 10
   final double scorePercentage;
   final Duration timeTaken;
   final DateTime completedAt;
@@ -145,11 +114,10 @@ class QuizResult {
     required this.completedAt,
   });
 
-  /// Factory constructor untuk calculate dari jawaban user
   factory QuizResult.calculate({
     required QuizCategory category,
     required List<QuizQuestion> questions,
-    required Map<int, int> userAnswers, // Map<questionIndex, answerIndex>
+    required Map<int, int> userAnswers,
     required DateTime startTime,
     required DateTime endTime,
   }) {
@@ -165,7 +133,7 @@ class QuizResult {
     }
 
     final wrongCount = questions.length - correctCount;
-    final totalScore = correctCount * 10; // Benar = +10
+    final totalScore = correctCount * 10;
     final percentage = questions.length > 0
         ? (correctCount / questions.length) * 100
         : 0.0;
@@ -183,7 +151,6 @@ class QuizResult {
     );
   }
 
-  /// Get grade berdasarkan percentage
   String get grade {
     if (scorePercentage >= 90) return 'Excellent';
     if (scorePercentage >= 80) return 'Very Good';
@@ -193,7 +160,6 @@ class QuizResult {
     return 'Need Improvement';
   }
 
-  /// Get emoji berdasarkan score
   String get emoji {
     if (scorePercentage >= 90) return '🏆';
     if (scorePercentage >= 80) return '🌟';
@@ -203,7 +169,6 @@ class QuizResult {
     return '😢';
   }
 
-  /// Format time taken
   String get formattedTime {
     final minutes = timeTaken.inMinutes;
     final seconds = timeTaken.inSeconds.remainder(60);

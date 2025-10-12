@@ -4,36 +4,27 @@ import 'package:budaya_indonesia/common/static/result_state.dart';
 import '../models/quiz_model.dart';
 import 'dart:developer' as dev;
 import 'dart:math' as math;
+import 'dart:async';
 
-/// Provider untuk Quiz Feature
-///
-/// Mengikuti pattern dari ProfileProvider dan MusicDetailProvider
-/// - State management dengan ResultState<T>
-/// - Supabase integration
-/// - Error handling dengan try-catch
-/// - Logging dengan dev.log()
 class QuizProvider extends ChangeNotifier {
   final SupabaseClient _client;
+  Timer? _timer;
 
   QuizProvider({SupabaseClient? client})
     : _client = client ?? Supabase.instance.client;
 
-  // ============================================================================
-  // STATE VARIABLES (pattern dari ProfileProvider)
-  // ============================================================================
-
   ResultState<List<QuizQuestion>> _state = ResultState.none();
   List<QuizQuestion> _questions = [];
-  Map<int, int> _userAnswers = {}; // Map<questionIndex, answerIndex>
+  Map<int, int> _userAnswers = {};
+  Map<int, bool> _submittedAnswers =
+      {}; // Track which answers have been checked
   int _currentQuestionIndex = 0;
   DateTime? _quizStartTime;
   bool _isQuizCompleted = false;
   QuizResult? _lastResult;
   QuizCategory? _selectedCategory;
-
-  // ============================================================================
-  // GETTERS (pattern dari ProfileProvider)
-  // ============================================================================
+  Duration _remainingTime = const Duration(minutes: 5);
+  int _confirmedScore = 0; // Score yang sudah dikonfirmasi (setelah klik Next)
 
   ResultState<List<QuizQuestion>> get state => _state;
   List<QuizQuestion> get questions => _questions;
@@ -41,6 +32,10 @@ class QuizProvider extends ChangeNotifier {
   bool get isQuizCompleted => _isQuizCompleted;
   QuizResult? get lastResult => _lastResult;
   QuizCategory? get selectedCategory => _selectedCategory;
+  Duration get remainingTime => _remainingTime;
+  int get confirmedScore => _confirmedScore; // Score yang ditampilkan
+  bool get isTimerWarning =>
+      _remainingTime.inSeconds < 60; // Warning jika < 1 menit
 
   QuizQuestion? get currentQuestion {
     if (_currentQuestionIndex >= _questions.length) return null;
@@ -52,29 +47,10 @@ class QuizProvider extends ChangeNotifier {
   bool get hasNextQuestion => _currentQuestionIndex < _questions.length - 1;
   bool get hasPreviousQuestion => _currentQuestionIndex > 0;
 
-  /// Get current score (temporary, during quiz)
-  int get currentScore {
-    int correct = 0;
-    for (int i = 0; i < _questions.length; i++) {
-      final answer = _userAnswers[i];
-      if (answer != null && _questions[i].isCorrect(answer)) {
-        correct++;
-      }
-    }
-    return correct * 10;
+  bool isAnswerSubmitted(int index) {
+    return _submittedAnswers[index] == true;
   }
 
-  // ============================================================================
-  // LOAD QUESTIONS (pattern dari MusicDetailProvider)
-  // ============================================================================
-
-  /// Load random 10 questions dari Supabase
-  ///
-  /// Flow:
-  /// 1. Set loading state
-  /// 2. Fetch dari Supabase dengan filter kategori
-  /// 3. Shuffle & ambil 10 random
-  /// 4. Set success/error state
   Future<void> loadQuestions(QuizCategory category) async {
     dev.log(
       'loadQuestions() start - category: ${category.displayName}',
@@ -88,13 +64,12 @@ class QuizProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
-      // Fetch dari Supabase dengan filter kategori
       dev.log('Fetching from soal_kuis table', name: 'QuizProvider');
 
       final response = await _client
           .from('soal_kuis')
           .select()
-          .eq('kategori', category.name) // Filter by category
+          .eq('kategori', category.name)
           .order('id', ascending: true);
 
       dev.log(
@@ -102,9 +77,8 @@ class QuizProvider extends ChangeNotifier {
         name: 'QuizProvider',
       );
 
-      // Parse ke QuizQuestion objects
       final allQuestions = (response as List<dynamic>)
-          .map((json) => QuizQuestion.fromJson(json as Map<String, dynamic>))
+          .map((json) => QuizQuestion.fromMap(json as Map<String, dynamic>))
           .toList();
 
       if (allQuestions.isEmpty) {
@@ -113,7 +87,6 @@ class QuizProvider extends ChangeNotifier {
         );
       }
 
-      // Shuffle dan ambil 10 random questions
       final shuffled = List<QuizQuestion>.from(allQuestions);
       shuffled.shuffle(math.Random());
 
@@ -124,12 +97,16 @@ class QuizProvider extends ChangeNotifier {
         name: 'QuizProvider',
       );
 
-      // Set state
       _questions = selectedQuestions;
       _userAnswers = {};
+      _submittedAnswers = {};
       _currentQuestionIndex = 0;
       _quizStartTime = DateTime.now();
+      _remainingTime = const Duration(minutes: 5);
+      _confirmedScore = 0;
       _state = ResultState.success(selectedQuestions);
+
+      _startTimer();
 
       dev.log('Quiz loaded successfully', name: 'QuizProvider');
     } catch (e, stackTrace) {
@@ -146,18 +123,68 @@ class QuizProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  /// Retry load questions (untuk error state)
   Future<void> retryLoadQuestions() async {
     if (_selectedCategory != null) {
       await loadQuestions(_selectedCategory!);
     }
   }
 
-  // ============================================================================
-  // ANSWER MANAGEMENT (pattern dari ProfileProvider)
-  // ============================================================================
+  void _startTimer() {
+    _timer?.cancel();
+    _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      if (_remainingTime.inSeconds > 0) {
+        _remainingTime = Duration(seconds: _remainingTime.inSeconds - 1);
+        notifyListeners();
 
-  /// Answer current question
+        if (_remainingTime.inSeconds == 0) {
+          dev.log('Timer expired, auto-submit quiz', name: 'QuizProvider');
+          _timer?.cancel();
+          submitQuiz();
+        }
+      }
+    });
+  }
+
+  void _stopTimer() {
+    _timer?.cancel();
+    dev.log('Timer stopped', name: 'QuizProvider');
+  }
+
+  String get formattedTime {
+    final minutes = _remainingTime.inMinutes;
+    final seconds = _remainingTime.inSeconds.remainder(60);
+    return '${minutes.toString().padLeft(1, '0')}:${seconds.toString().padLeft(2, '0')}';
+  }
+
+  bool submitCurrentAnswer() {
+    if (_submittedAnswers[_currentQuestionIndex] == true) {
+      return false; // Already submitted
+    }
+
+    final userAnswer = _userAnswers[_currentQuestionIndex];
+    if (userAnswer == null) {
+      return false; // No answer selected
+    }
+
+    final question = _questions[_currentQuestionIndex];
+    final isCorrect = question.isCorrect(userAnswer);
+
+    _submittedAnswers[_currentQuestionIndex] = true;
+
+    if (isCorrect) {
+      _confirmedScore += 10;
+      dev.log(
+        'Answer correct! Score +10, total: $_confirmedScore',
+        name: 'QuizProvider',
+      );
+    } else {
+      dev.log('Answer wrong, score unchanged', name: 'QuizProvider');
+    }
+
+    notifyListeners();
+    return isCorrect;
+  }
+
   void answerQuestion(int answerIndex) {
     if (_isQuizCompleted) {
       dev.log('Cannot answer: quiz already completed', name: 'QuizProvider');
@@ -179,12 +206,10 @@ class QuizProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  /// Get selected answer untuk specific question index
   int? getSelectedAnswer(int questionIndex) {
     return _userAnswers[questionIndex];
   }
 
-  /// Clear answer for current question
   void clearCurrentAnswer() {
     _userAnswers.remove(_currentQuestionIndex);
     dev.log(
@@ -193,10 +218,6 @@ class QuizProvider extends ChangeNotifier {
     );
     notifyListeners();
   }
-
-  // ============================================================================
-  // NAVIGATION (pattern dari MusicDetailProvider)
-  // ============================================================================
 
   void nextQuestion() {
     if (!hasNextQuestion) return;
@@ -219,20 +240,16 @@ class QuizProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  // ============================================================================
-  // QUIZ COMPLETION
-  // ============================================================================
-
-  /// Submit quiz dan calculate hasil
   QuizResult submitQuiz() {
     if (_isQuizCompleted && _lastResult != null) {
       return _lastResult!;
     }
 
+    _stopTimer();
+
     final endTime = DateTime.now();
     final startTime = _quizStartTime ?? endTime;
 
-    // Calculate result
     final result = QuizResult.calculate(
       category: _selectedCategory!,
       questions: _questions,
@@ -253,12 +270,10 @@ class QuizProvider extends ChangeNotifier {
     return result;
   }
 
-  /// Check if question at index is answered
   bool isQuestionAnswered(int index) {
     return _userAnswers.containsKey(index);
   }
 
-  /// Check if answer is correct (only after quiz completed)
   bool? isAnswerCorrect(int questionIndex) {
     if (!_isQuizCompleted) return null;
 
@@ -269,7 +284,6 @@ class QuizProvider extends ChangeNotifier {
     return question.isCorrect(userAnswer);
   }
 
-  /// Get unanswered question indices
   List<int> getUnansweredQuestions() {
     final unanswered = <int>[];
     for (int i = 0; i < _questions.length; i++) {
@@ -280,11 +294,6 @@ class QuizProvider extends ChangeNotifier {
     return unanswered;
   }
 
-  // ============================================================================
-  // RESET (pattern dari ProfileProvider)
-  // ============================================================================
-
-  /// Reset quiz state (untuk retry dengan category yang sama)
   void resetQuiz() {
     _state = ResultState.none();
     _questions = [];
@@ -299,7 +308,6 @@ class QuizProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  /// Clear everything termasuk selected category
   void clearAll() {
     _state = ResultState.none();
     _questions = [];
@@ -316,6 +324,7 @@ class QuizProvider extends ChangeNotifier {
 
   @override
   void dispose() {
+    _timer?.cancel();
     dev.log('QuizProvider disposed', name: 'QuizProvider');
     super.dispose();
   }
