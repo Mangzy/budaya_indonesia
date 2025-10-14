@@ -1,9 +1,10 @@
+import 'package:budaya_indonesia/features/ar/pages/ar_page.dart';
 import 'package:budaya_indonesia/features/home/pages/home_page.dart';
 import 'package:budaya_indonesia/features/music/pages/music_page.dart';
+import 'package:budaya_indonesia/features/navbar/providers/navbar_provider.dart';
 import 'package:budaya_indonesia/features/profile/pages/profile_page.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../providers/navbar_provider.dart';
 
 // using Material icons for the bottom navigation
 /// Bottom navigation bar using Material icons with 5 pages.
@@ -34,16 +35,22 @@ class _BottomNavbarState extends State<BottomNavbar> {
     HomePage(),
     MusicPage(),
     Scaffold(
-      appBar: AppBar(title: const Text('AR')),
-      body: const Center(child: Text('AR page (placeholder)')),
-    ),
-    Scaffold(
       appBar: AppBar(title: const Text('Quiz')),
       body: const Center(child: Text('Quiz page')),
     ),
     ProfilePage(),
   ];
   void _onItemTapped(int index) {
+    if (index == 2) {
+    // Navigasi ke halaman AR dan hilangkan navbar
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => const ArPage(), // buka ARPage di route baru
+      ),
+    );
+    return;
+  }
     setState(() => _selectedIndex = index);
     if (widget.onTap != null) {
       widget.onTap!(index);
