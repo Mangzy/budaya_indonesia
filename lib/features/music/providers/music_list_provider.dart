@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'dart:developer' as dev;
 import '../models/music_daerah_model.dart';
+import 'dart:developer' as dev;
 
 enum LoadState { idle, loading, loaded, error }
 
@@ -35,7 +35,7 @@ class MusicListProvider extends ChangeNotifier {
   }
 
   Future<void> loadAll() async {
-    dev.log('loadAll() mulai', name: 'MusicListProvider');
+    dev.log('=== loadAll MULAI ===', name: 'MusicListProvider');
     _state = LoadState.loading;
     _error = null;
     notifyListeners();
@@ -64,16 +64,23 @@ class MusicListProvider extends ChangeNotifier {
 
       _songs = (res as List)
           .cast<Map<String, dynamic>>()
-          .map(LaguDaerah.fromMap)
+          .map((json) => LaguDaerah.fromMap(json))
           .toList();
 
       dev.log(
-        'lagu_daerah jumlah: ${_songs.length}',
+        'Berhasil memuat ${_songs.length} lagu',
         name: 'MusicListProvider',
       );
-      for (final song in _songs.take(5)) {
+
+      for (var i = 0; i < (_songs.length < 3 ? _songs.length : 3); i++) {
+        final song = _songs[i];
         dev.log(
-          '→ #${song.id} ${song.judul} (${song.asal}) - ${song.formattedDuration}',
+          'Lagu $i: ${song.judul} - ${song.asal}',
+          name: 'MusicListProvider',
+        );
+        dev.log('  URL: ${song.audioUrl}', name: 'MusicListProvider');
+        dev.log(
+          '  Durasi: ${song.formattedDuration}',
           name: 'MusicListProvider',
         );
       }
@@ -82,8 +89,9 @@ class MusicListProvider extends ChangeNotifier {
     } catch (e, st) {
       _error = e.toString();
       dev.log(
-        'Error lagu_daerah: $_error',
+        'ERROR loadAll: $_error',
         name: 'MusicListProvider',
+        error: e,
         stackTrace: st,
       );
       _state = LoadState.error;
@@ -100,34 +108,24 @@ class MusicListProvider extends ChangeNotifier {
   }
 
   void searchSongs(String query) {
-    dev.log('cariLagu() - kueri: "${query}"', name: 'MusicListProvider');
     _searchQuery = query.trim();
     notifyListeners();
   }
 
   void clearSearch() {
-    dev.log('bersihkanPencarian()', name: 'MusicListProvider');
     _searchQuery = null;
     notifyListeners();
   }
 
   Future<void> refresh() async {
-    dev.log('muatUlang()', name: 'MusicListProvider');
     await loadAll();
   }
 
   void reset() {
-    dev.log('resetAplikasi()', name: 'MusicListProvider');
     _state = LoadState.idle;
     _songs = [];
     _error = null;
     _searchQuery = null;
     notifyListeners();
-  }
-
-  @override
-  void dispose() {
-    dev.log('dispose()', name: 'MusicListProvider');
-    super.dispose();
   }
 }

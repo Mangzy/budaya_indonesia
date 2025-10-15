@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:just_audio/just_audio.dart';
-import 'dart:developer' as dev;
 import '../models/music_daerah_model.dart';
+import 'dart:developer' as dev;
 
 class MusicPlayerProvider extends ChangeNotifier {
   final AudioPlayer _player = AudioPlayer();
@@ -20,22 +20,36 @@ class MusicPlayerProvider extends ChangeNotifier {
   String? get errorMessage => _errorMessage;
 
   MusicPlayerProvider() {
+    _initializeAudioPlayer();
     _initializeListeners();
+  }
+
+  Future<void> _initializeAudioPlayer() async {
+    try {
+      await _player.setVolume(1.0);
+      dev.log(
+        'Audio player diinisialisasi dengan volume: 1.0',
+        name: 'MusicPlayerProvider',
+      );
+    } catch (e) {
+      dev.log('Error inisialisasi audio: $e', name: 'MusicPlayerProvider');
+    }
   }
 
   void _initializeListeners() {
     _player.playerStateStream.listen((playerState) {
       _isPlaying = playerState.playing;
 
+      dev.log(
+        'Status Player: ${playerState.processingState}, Playing: ${playerState.playing}',
+        name: 'MusicPlayerProvider',
+      );
+
       if (playerState.processingState == ProcessingState.completed) {
-        dev.log('Track selesai, mereset...', name: 'MusicPlayerProvider');
-        try {
-          _player.seek(Duration.zero);
-          _player.stop();
-          _isPlaying = false;
-        } catch (e) {
-          dev.log('Error saat selesai: $e', name: 'MusicPlayerProvider');
-        }
+        dev.log('Lagu selesai, mereset...', name: 'MusicPlayerProvider');
+        _player.seek(Duration.zero);
+        _player.stop();
+        _isPlaying = false;
       }
       notifyListeners();
     });
@@ -48,7 +62,10 @@ class MusicPlayerProvider extends ChangeNotifier {
     _player.durationStream.listen((duration) {
       if (duration != null) {
         _totalDuration = duration;
-
+        dev.log(
+          'Durasi dimuat: ${duration.inSeconds}s',
+          name: 'MusicPlayerProvider',
+        );
         if (_currentSong != null && _currentSong!.durasi == null) {
           _currentSong = _currentSong!.copyWith(durasi: duration);
         }
@@ -80,59 +97,94 @@ class MusicPlayerProvider extends ChangeNotifier {
   }
 
   Future<void> setCurrentSong(LaguDaerah song) async {
-    dev.log(
-      'setCurrentSong() - memuat: ${song.judul}',
-      name: 'MusicPlayerProvider',
-    );
+    dev.log('=== setCurrentSong MULAI ===', name: 'MusicPlayerProvider');
+    dev.log('Lagu: ${song.judul}', name: 'MusicPlayerProvider');
+    dev.log('URL Audio: ${song.audioUrl}', name: 'MusicPlayerProvider');
+    dev.log('URL Valid: ${song.hasValidAudioUrl}', name: 'MusicPlayerProvider');
 
     try {
+      if (!song.hasValidAudioUrl) {
+        throw Exception('URL audio tidak valid atau kosong');
+      }
+
       _currentSong = song;
       _errorMessage = null;
       _currentPosition = Duration.zero;
       _totalDuration = song.durasi ?? Duration.zero;
 
+      dev.log('Mengatur sumber audio...', name: 'MusicPlayerProvider');
       await _player.setUrl(song.audioUrl);
+      dev.log('Sumber audio berhasil diatur!', name: 'MusicPlayerProvider');
 
       notifyListeners();
     } catch (e, st) {
       _errorMessage = 'Gagal memuat audio: $e';
       dev.log(
-        'Error setCurrentSong: $e',
+        'ERROR setCurrentSong: $e',
         name: 'MusicPlayerProvider',
+        error: e,
         stackTrace: st,
       );
       notifyListeners();
+      rethrow;
     }
   }
 
   Future<void> togglePlayPause() async {
     if (_currentSong == null) {
-      dev.log(
-        'togglePlayPause() - tidak ada lagu yang dipilih',
-        name: 'MusicPlayerProvider',
-      );
+      dev.log('Tidak ada lagu yang dipilih', name: 'MusicPlayerProvider');
       return;
     }
 
     dev.log(
-      'togglePlayPause() - sedang diputar: $_isPlaying',
+      'togglePlayPause - sedang diputar: $_isPlaying',
       name: 'MusicPlayerProvider',
     );
 
     try {
       if (_isPlaying) {
+        dev.log('Menjeda...', name: 'MusicPlayerProvider');
         await _player.pause();
       } else {
         if (_player.audioSource == null) {
+          dev.log(
+            'Tidak ada sumber audio, memuat...',
+            name: 'MusicPlayerProvider',
+          );
           await _player.setUrl(_currentSong!.audioUrl);
         }
+
+        final currentVolume = _player.volume;
+        dev.log(
+          'Volume saat ini sebelum play: $currentVolume',
+          name: 'MusicPlayerProvider',
+        );
+
+        await _player.setVolume(1.0);
+        dev.log('Volume diatur ke 1.0', name: 'MusicPlayerProvider');
+
+        dev.log('Memutar...', name: 'MusicPlayerProvider');
         await _player.play();
+
+        dev.log(
+          'Perintah play terkirim, mengecek status...',
+          name: 'MusicPlayerProvider',
+        );
+        dev.log(
+          'Player sedang memutar: ${_player.playing}',
+          name: 'MusicPlayerProvider',
+        );
+        dev.log(
+          'Posisi player: ${_player.position.inSeconds}s',
+          name: 'MusicPlayerProvider',
+        );
       }
     } catch (e, st) {
       _errorMessage = 'Error playback: $e';
       dev.log(
-        'Error togglePlayPause: $e',
+        'ERROR togglePlayPause: $e',
         name: 'MusicPlayerProvider',
+        error: e,
         stackTrace: st,
       );
       notifyListeners();
@@ -145,21 +197,14 @@ class MusicPlayerProvider extends ChangeNotifier {
   }
 
   Future<void> seekTo(Duration position) async {
-    dev.log(
-      'seekTo() - posisi: ${position.inSeconds}s',
-      name: 'MusicPlayerProvider',
-    );
     try {
       await _player.seek(position);
       _currentPosition = position;
       notifyListeners();
-    } catch (e, st) {
-      dev.log('Error seekTo: $e', name: 'MusicPlayerProvider', stackTrace: st);
-    }
+    } catch (e) {}
   }
 
   Future<void> stop() async {
-    dev.log('stop()', name: 'MusicPlayerProvider');
     try {
       await _player.stop();
       await _player.seek(Duration.zero);
@@ -167,13 +212,10 @@ class MusicPlayerProvider extends ChangeNotifier {
       _currentPosition = Duration.zero;
       _currentSong = null;
       notifyListeners();
-    } catch (e, st) {
-      dev.log('Error stop: $e', name: 'MusicPlayerProvider', stackTrace: st);
-    }
+    } catch (e) {}
   }
 
   void reset() {
-    dev.log('reset()', name: 'MusicPlayerProvider');
     _player.stop();
     _currentSong = null;
     _isPlaying = false;
@@ -185,7 +227,6 @@ class MusicPlayerProvider extends ChangeNotifier {
 
   @override
   void dispose() {
-    dev.log('dispose()', name: 'MusicPlayerProvider');
     _player.dispose();
     super.dispose();
   }

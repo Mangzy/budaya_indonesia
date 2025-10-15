@@ -1,6 +1,11 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
     <!-- Allow network access (recommended for Firebase / network calls) -->
     <uses-permission android:name="android.permission.INTERNET" />
+    
+    <!-- Audio playback permissions -->
+    <uses-permission android:name="android.permission.WAKE_LOCK"/>
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
+    
     <application
         android:label="budaya_indonesia"
         android:name="${applicationName}"
