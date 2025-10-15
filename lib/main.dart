@@ -2,24 +2,24 @@ import 'package:budaya_indonesia/common/theme/app_theme.dart';
 import 'package:budaya_indonesia/features/music/pages/music_page.dart';
 import 'package:budaya_indonesia/features/music/providers/music_list_provider.dart';
 import 'package:budaya_indonesia/features/music/providers/music_player_provider.dart';
-// import 'package:budaya_indonesia/features/navbar/pages/bottom_navbar.dart';
-// import 'package:budaya_indonesia/features/navbar/providers/navbar_provider.dart';
-// import 'package:budaya_indonesia/features/home/pages/home_page.dart';
-// import 'package:budaya_indonesia/features/login/pages/login_pages.dart';
-// import 'package:budaya_indonesia/features/register/pages/register_page.dart';
+import 'package:budaya_indonesia/features/navbar/pages/bottom_navbar.dart';
+import 'package:budaya_indonesia/features/navbar/providers/navbar_provider.dart';
+import 'package:budaya_indonesia/features/home/pages/home_page.dart';
+import 'package:budaya_indonesia/features/login/pages/login_pages.dart';
+import 'package:budaya_indonesia/features/register/pages/register_page.dart';
 import 'package:flutter/material.dart';
 
-// import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:provider/provider.dart';
-// import 'package:budaya_indonesia/src/auth_provider.dart';
+import 'package:budaya_indonesia/src/auth_provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-// import 'firebase_options.dart';
+import 'firebase_options.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Komen Firebase untuk testing musik only
-  // await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  // Inisialisasi Firebase (dibutuhkan oleh banyak provider/fitur)
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
   await Supabase.initialize(
     url: 'https://thepsfcpxbarhbelsgjc.supabase.co',
@@ -42,13 +42,10 @@ class _MainAppState extends State<MainApp> {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
-        // Komen provider yang tidak berhubungan dengan musik
-        // ChangeNotifierProvider(
-        //   create: (_) => AuthProvider()..listenAuthState(),
-        // ),
-        // ChangeNotifierProvider(create: (_) => NavbarProvider()),
-
-        // Provider untuk fitur musik
+        ChangeNotifierProvider(
+        create: (_) => AuthProvider()..listenAuthState(),
+        ),
+        ChangeNotifierProvider(create: (_) => NavbarProvider()),
         ChangeNotifierProvider(
           create: (_) => MusicListProvider(client: Supabase.instance.client),
         ),
@@ -59,14 +56,12 @@ class _MainAppState extends State<MainApp> {
         theme: AppTheme.light,
         darkTheme: AppTheme.dark,
         themeMode: ThemeMode.light,
-        // Langsung ke MusicPage untuk testing
         home: const MusicPage(),
         routes: {
-          // Komen routes yang tidak perlu untuk testing musik
-          // '/login': (context) => const LoginPages(),
-          // '/register': (context) => const RegisterPage(),
-          // '/home': (context) => const HomePage(),
-          // '/navbar': (context) => const BottomNavbar(),
+          '/login': (context) => const LoginPages(),
+          '/register': (context) => const RegisterPage(),
+          '/home': (context) => const HomePage(),
+          '/navbar': (context) => const BottomNavbar(),
           '/music': (context) => const MusicPage(),
         },
       ),
