@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
+import '../../../common/static/app_color.dart';
 import '../models/music_daerah_model.dart';
 import '../providers/music_player_provider.dart';
 
@@ -19,7 +21,7 @@ class MusicPlayerCard extends StatelessWidget {
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
       elevation: 2,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      color: hasError ? Colors.red.shade400 : const Color(0xFF4DB6AC),
+      color: hasError ? Colors.red.shade400 : AppColors.primary,
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Row(
@@ -32,7 +34,7 @@ class MusicPlayerCard extends StatelessWidget {
                 children: [
                   Text(
                     '${song.judul} - ${song.asal}',
-                    style: const TextStyle(
+                    style: GoogleFonts.montserrat(
                       color: Colors.white,
                       fontSize: 14,
                       fontWeight: FontWeight.w600,
@@ -45,7 +47,10 @@ class MusicPlayerCard extends StatelessWidget {
                     const SizedBox(height: 4),
                     Text(
                       playerProvider.errorMessage!,
-                      style: const TextStyle(color: Colors.white, fontSize: 10),
+                      style: GoogleFonts.montserrat(
+                        color: Colors.white,
+                        fontSize: 10,
+                      ),
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                     ),
@@ -96,7 +101,7 @@ class MusicPlayerCard extends StatelessWidget {
                           isCurrentSong
                               ? playerProvider.formattedPosition
                               : '00:00',
-                          style: TextStyle(
+                          style: GoogleFonts.montserrat(
                             color: Colors.white.withOpacity(0.9),
                             fontSize: 11,
                           ),
@@ -105,7 +110,7 @@ class MusicPlayerCard extends StatelessWidget {
                           isCurrentSong
                               ? playerProvider.formattedDuration
                               : song.formattedDuration,
-                          style: TextStyle(
+                          style: GoogleFonts.montserrat(
                             color: Colors.white.withOpacity(0.9),
                             fontSize: 11,
                           ),
@@ -137,7 +142,7 @@ class MusicPlayerCard extends StatelessWidget {
                   alignment: Alignment.center,
                   child: Icon(
                     isPlaying ? Icons.pause : Icons.play_arrow,
-                    color: const Color(0xFF4DB6AC),
+                    color: AppColors.primary,
                     size: 28,
                   ),
                 ),

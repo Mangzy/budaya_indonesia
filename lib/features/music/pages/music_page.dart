@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
+import '../../../common/static/app_color.dart';
 import '../providers/music_list_provider.dart';
 import '../providers/music_player_provider.dart';
 import '../widgets/music_player_card.dart';
@@ -18,7 +19,7 @@ class _MusicPageState extends State<MusicPage> {
   @override
   void initState() {
     super.initState();
-    // Load lagu saat pertama kali masuk halaman
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final provider = context.read<MusicListProvider>();
       if (provider.state == LoadState.idle) {
@@ -30,7 +31,7 @@ class _MusicPageState extends State<MusicPage> {
   @override
   void dispose() {
     _searchController.dispose();
-    // Stop player saat keluar dari halaman musik
+
     context.read<MusicPlayerProvider>().stop();
     super.dispose();
   }
@@ -38,35 +39,29 @@ class _MusicPageState extends State<MusicPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFE8F5E9), // Light green background
+      backgroundColor: AppColors.tertiary,
       appBar: AppBar(
         centerTitle: true,
-        backgroundColor: const Color(0xFF4DB6AC),
+        backgroundColor: AppColors.tertiary,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.white),
-          onPressed: () {
-            // Navigate back atau handle sesuai kebutuhan
-            // Karena ini di dalam bottom navbar, biasanya tidak perlu back
-            // Tapi sesuai mockup ada back button, jadi saya tambahkan
-          },
+          icon: const Icon(Icons.arrow_back, color: Colors.black),
+          onPressed: () {},
         ),
         title: Text(
           'Lagu Daerah',
-          style: TextStyle(
+          style: GoogleFonts.montserrat(
             fontWeight: FontWeight.bold,
             fontSize: 18,
-            color: Colors.white,
-            fontFamily: GoogleFonts.roboto().fontFamily,
+            color: Colors.black,
           ),
         ),
       ),
       body: Column(
         children: [
-          // Search bar
           Container(
             padding: const EdgeInsets.all(16),
-            color: const Color(0xFFE8F5E9),
+            color: AppColors.tertiary,
             child: TextField(
               controller: _searchController,
               onChanged: (value) {
@@ -74,7 +69,10 @@ class _MusicPageState extends State<MusicPage> {
               },
               decoration: InputDecoration(
                 hintText: 'Cari nama lagu atau provinsi',
-                hintStyle: TextStyle(color: Colors.grey.shade600, fontSize: 14),
+                hintStyle: GoogleFonts.montserrat(
+                  color: Colors.grey.shade600,
+                  fontSize: 13,
+                ),
                 prefixIcon: Icon(Icons.search, color: Colors.grey.shade600),
                 suffixIcon: _searchController.text.isNotEmpty
                     ? IconButton(
@@ -98,19 +96,14 @@ class _MusicPageState extends State<MusicPage> {
               ),
             ),
           ),
-
-          // List lagu
           Expanded(
             child: Consumer<MusicListProvider>(
               builder: (context, provider, _) {
-                // Loading state
                 if (provider.state == LoadState.loading) {
-                  return const Center(
-                    child: CircularProgressIndicator(color: Color(0xFF4DB6AC)),
+                  return Center(
+                    child: CircularProgressIndicator(color: AppColors.primary),
                   );
                 }
-
-                // Error state
                 if (provider.state == LoadState.error) {
                   return Center(
                     child: Column(
@@ -124,7 +117,7 @@ class _MusicPageState extends State<MusicPage> {
                         const SizedBox(height: 16),
                         Text(
                           'Gagal memuat lagu',
-                          style: TextStyle(
+                          style: GoogleFonts.montserrat(
                             fontSize: 16,
                             fontWeight: FontWeight.w600,
                             color: Colors.grey.shade800,
@@ -133,7 +126,7 @@ class _MusicPageState extends State<MusicPage> {
                         const SizedBox(height: 8),
                         Text(
                           provider.error ?? 'Terjadi kesalahan',
-                          style: TextStyle(
+                          style: GoogleFonts.montserrat(
                             fontSize: 14,
                             color: Colors.grey.shade600,
                           ),
@@ -145,7 +138,7 @@ class _MusicPageState extends State<MusicPage> {
                           icon: const Icon(Icons.refresh),
                           label: const Text('Coba Lagi'),
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0xFF4DB6AC),
+                            backgroundColor: AppColors.primary,
                             foregroundColor: Colors.white,
                           ),
                         ),
@@ -153,8 +146,6 @@ class _MusicPageState extends State<MusicPage> {
                     ),
                   );
                 }
-
-                // Empty state
                 final songs = provider.filteredSongs;
                 if (songs.isEmpty) {
                   return Center(
@@ -172,7 +163,7 @@ class _MusicPageState extends State<MusicPage> {
                                   provider.searchQuery!.isNotEmpty
                               ? 'Tidak ada lagu ditemukan'
                               : 'Belum ada lagu tersedia',
-                          style: TextStyle(
+                          style: GoogleFonts.montserrat(
                             fontSize: 16,
                             color: Colors.grey.shade600,
                           ),
@@ -181,9 +172,8 @@ class _MusicPageState extends State<MusicPage> {
                     ),
                   );
                 }
-
-                // List lagu dengan MusicPlayerCard
                 return ListView.builder(
+                  physics: const BouncingScrollPhysics(),
                   padding: const EdgeInsets.only(top: 8, bottom: 16),
                   itemCount: songs.length,
                   itemBuilder: (context, index) {

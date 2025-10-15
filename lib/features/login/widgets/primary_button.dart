@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 class PrimaryButton extends StatelessWidget {
   final VoidCallback? onPressed;
   final Widget child;
-
   const PrimaryButton({
     super.key,
     required this.onPressed,
@@ -12,19 +11,22 @@ class PrimaryButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final color = const Color(0xFF006F5F); // konsisten dengan desain hijau tua
     return SizedBox(
       width: double.infinity,
-      child: OutlinedButton(
+      child: ElevatedButton(
         onPressed: onPressed,
-        style: OutlinedButton.styleFrom(
-          side: BorderSide(
-            color: Theme.of(context).colorScheme.primary,
-            width: 1.5,
-          ),
+        style: ElevatedButton.styleFrom(
+          backgroundColor: color,
+          // ignore: deprecated_member_use
+          disabledBackgroundColor: color.withOpacity(.4),
+          foregroundColor: Colors.white,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(28),
+            borderRadius: BorderRadius.circular(32),
           ),
-          padding: const EdgeInsets.symmetric(vertical: 12),
+          elevation: 0,
+          padding: const EdgeInsets.symmetric(vertical: 14),
+          textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
         ),
         child: child,
       ),
