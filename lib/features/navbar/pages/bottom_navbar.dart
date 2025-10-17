@@ -23,7 +23,7 @@ class _BottomNavbarState extends State<BottomNavbar> {
     Icons.home,
     Icons.audiotrack,
     Icons.camera_alt,
-    Icons.quiz,
+    Icons.photo_album,
     Icons.person,
   ];
 
@@ -41,7 +41,7 @@ class _BottomNavbarState extends State<BottomNavbar> {
       body: const Center(child: Text('AR page (placeholder)')),
     ),
     Scaffold(
-      appBar: AppBar(title: const Text('Quiz')),
+      appBar: AppBar(title: const Text('')),
       body: const Center(child: Text('Quiz page')),
     ),
     // Profile
@@ -143,7 +143,7 @@ class _BottomNavbarState extends State<BottomNavbar> {
       case 2:
         return 'AR';
       case 3:
-        return 'Quiz';
+        return 'Clothes';
       case 4:
         return 'Profile';
       default:
