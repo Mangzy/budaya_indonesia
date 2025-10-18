@@ -3,6 +3,7 @@ import 'package:budaya_indonesia/features/profile/widgets/profile_button.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
+import 'package:budaya_indonesia/src/auth_provider.dart';
 import 'dart:io';
 
 class ProfilePage extends StatelessWidget {
@@ -15,10 +16,10 @@ class ProfilePage extends StatelessWidget {
         centerTitle: true,
         title: Text(
           'Profile',
-          style: TextStyle(
+          style: GoogleFonts.montserrat(
             fontWeight: FontWeight.bold,
             fontSize: 18,
-            fontFamily: GoogleFonts.roboto().fontFamily,
+            color: Theme.of(context).colorScheme.onSurface,
           ),
         ),
       ),
@@ -100,8 +101,13 @@ class ProfilePage extends StatelessWidget {
               ProfileActionTile(
                 icon: Icons.logout,
                 label: 'Log Out',
-                onTap: () =>
-                    Navigator.of(context).pushReplacementNamed('/login'),
+                onTap: () async {
+                  await context.read<AuthProvider>().signOut();
+                  if (!context.mounted) return;
+                  Navigator.of(
+                    context,
+                  ).pushNamedAndRemoveUntil('/login', (route) => false);
+                },
               ),
             ],
           );

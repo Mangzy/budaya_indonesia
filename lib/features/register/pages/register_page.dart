@@ -114,6 +114,7 @@ class _RegisterPageState extends State<RegisterPage> {
                                     const _FieldLabel('Nama'),
                                     _PillField(
                                       controller: _nameCtrl,
+                                      hintText: 'Masukkan nama lengkap',
                                       validator: (v) => (v ?? '').isNotEmpty
                                           ? null
                                           : 'Nama wajib',
@@ -122,6 +123,7 @@ class _RegisterPageState extends State<RegisterPage> {
                                     const _FieldLabel('Email'),
                                     _PillField(
                                       controller: _emailCtrl,
+                                      hintText: 'Masukkan email',
                                       validator: (v) => (v ?? '').contains('@')
                                           ? null
                                           : 'Email tidak valid',
@@ -130,6 +132,7 @@ class _RegisterPageState extends State<RegisterPage> {
                                     const _FieldLabel('Password'),
                                     _PillField(
                                       controller: _passCtrl,
+                                      hintText: 'Buat kata sandi',
                                       obscure: true,
                                       enableToggle: true,
                                       validator: (v) => (v ?? '').length >= 6
@@ -140,6 +143,7 @@ class _RegisterPageState extends State<RegisterPage> {
                                     const _FieldLabel('Konfirmasi Password'),
                                     _PillField(
                                       controller: _confirmCtrl,
+                                      hintText: 'Ulangi kata sandi',
                                       obscure: true,
                                       enableToggle: true,
                                       validator: (v) {
@@ -250,11 +254,13 @@ class _PillField extends StatefulWidget {
   final bool obscure;
   final bool enableToggle;
   final String? Function(String?)? validator;
+  final String? hintText;
   const _PillField({
     required this.controller,
     this.obscure = false,
     this.enableToggle = false,
     this.validator,
+    this.hintText,
   });
   @override
   State<_PillField> createState() => _PillFieldState();
@@ -288,6 +294,8 @@ class _PillFieldState extends State<_PillField> {
       obscureText: widget.obscure ? _hide : false,
       validator: widget.validator,
       decoration: InputDecoration(
+        hintText: widget.hintText,
+        hintStyle: TextStyle(color: Colors.grey.shade500, fontSize: 13),
         filled: true,
         fillColor: Colors.white,
         contentPadding: const EdgeInsets.symmetric(

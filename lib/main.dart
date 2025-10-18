@@ -18,6 +18,8 @@ import 'package:budaya_indonesia/features/profile/pages/profile_page.dart';
 import 'package:budaya_indonesia/features/register/pages/register_page.dart';
 import 'package:budaya_indonesia/features/quiz/pages/quiz_page.dart';
 import 'package:budaya_indonesia/features/quiz/providers/quiz_provider.dart';
+import 'package:budaya_indonesia/features/splash/pages/splash_page.dart';
+import 'package:budaya_indonesia/features/ar/providers/ar_assets_provider.dart';
 import 'package:flutter/material.dart';
 
 import 'package:firebase_core/firebase_core.dart';
@@ -75,6 +77,10 @@ class _MainAppState extends State<MainApp> {
         ChangeNotifierProvider(create: (_) => ArProvider()),
         ChangeNotifierProvider(
           create: (_) =>
+              ArAssetsProvider(client: Supabase.instance.client)..refresh(),
+        ),
+        ChangeNotifierProvider(
+          create: (_) =>
               PakaianProvider(client: Supabase.instance.client)..refresh(),
         ),
         ChangeNotifierProvider(
@@ -93,13 +99,9 @@ class _MainAppState extends State<MainApp> {
                   theme: AppTheme.light,
                   darkTheme: AppTheme.dark,
                   themeMode: isDark ? ThemeMode.dark : ThemeMode.light,
-                  home: Consumer<AuthProvider>(
-                    builder: (context, auth, _) {
-                      if (auth.user == null) return const LoginPages();
-                      return const BottomNavbar();
-                    },
-                  ),
+                  home: const SplashPage(),
                   routes: {
+                    '/splash': (context) => const SplashPage(),
                     '/login': (context) => const LoginPages(),
                     '/register': (context) => const RegisterPage(),
                     '/home': (context) => const HomePage(),

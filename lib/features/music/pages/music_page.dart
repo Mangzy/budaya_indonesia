@@ -15,6 +15,7 @@ class MusicPage extends StatefulWidget {
 
 class _MusicPageState extends State<MusicPage> {
   final TextEditingController _searchController = TextEditingController();
+  MusicPlayerProvider? _player;
 
   @override
   void initState() {
@@ -29,25 +30,29 @@ class _MusicPageState extends State<MusicPage> {
   }
 
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // Cache the provider reference so we don't look it up in dispose
+    _player ??= context.read<MusicPlayerProvider>();
+  }
+
+  @override
   void dispose() {
     _searchController.dispose();
-
-    context.read<MusicPlayerProvider>().stop();
+    // Avoid looking up Provider from a deactivated context
+    try {
+      _player?.stop();
+    } catch (_) {}
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.tertiary,
       appBar: AppBar(
         centerTitle: true,
-        backgroundColor: AppColors.tertiary,
         elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.black),
-          onPressed: () {},
-        ),
+
         title: Text(
           'Lagu Daerah',
           style: GoogleFonts.montserrat(
