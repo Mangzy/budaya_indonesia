@@ -1,18 +1,33 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:budaya_indonesia/common/static/app_color.dart';
 import '../models/quiz_model.dart';
 import '../providers/quiz_provider.dart';
-import 'category_selection_page.dart';
 
 class ResultPage extends StatelessWidget {
   final QuizResult result;
 
   const ResultPage({super.key, required this.result});
 
+  String get motivationalMessage {
+    final percentage = (result.correctAnswers / result.totalQuestions) * 100;
+
+    if (percentage < 50) {
+      return 'Jangan menyerah! Pelajari lagi budaya Indonesia dan coba lagi! 💪';
+    } else if (percentage < 70) {
+      return 'Bagus! Kamu sudah cukup paham, tingkatkan lagi! 👍';
+    } else if (percentage < 85) {
+      return 'Hebat! Pengetahuanmu tentang budaya Indonesia sangat baik! 🌟';
+    } else {
+      return 'Luar biasa! Kamu ahli budaya Indonesia! 🏆';
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFE0F2F1),
+      backgroundColor: AppColors.tertiary,
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
@@ -20,35 +35,29 @@ class ResultPage extends StatelessWidget {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                // Emoji
-                Text(result.emoji, style: const TextStyle(fontSize: 100)),
-                const SizedBox(height: 20),
-
-                // Title
-                const Text(
+                Text(
                   'Quiz Selesai!',
-                  style: TextStyle(
+                  style: GoogleFonts.montserrat(
                     fontSize: 32,
                     fontWeight: FontWeight.bold,
                     color: Colors.black87,
                   ),
                 ),
-                const SizedBox(height: 10),
+                const SizedBox(height: 16),
 
-                // Grade
                 Text(
-                  result.grade,
-                  style: const TextStyle(
-                    fontSize: 24,
+                  motivationalMessage,
+                  textAlign: TextAlign.center,
+                  style: GoogleFonts.montserrat(
+                    fontSize: 16,
                     fontWeight: FontWeight.w600,
-                    color: Color(0xFF4DB6AC),
+                    color: Colors.black87,
                   ),
                 ),
-                const SizedBox(height: 40),
+                const SizedBox(height: 24),
 
-                // Score card
                 Container(
-                  padding: const EdgeInsets.all(32),
+                  padding: const EdgeInsets.all(24),
                   decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(30),
@@ -63,62 +72,59 @@ class ResultPage extends StatelessWidget {
                   ),
                   child: Column(
                     children: [
-                      // Total Score
-                      const Text(
+                      Text(
                         'Skor Anda',
-                        style: TextStyle(fontSize: 18, color: Colors.black54),
+                        style: GoogleFonts.montserrat(
+                          fontSize: 18,
+                          color: Colors.black,
+                        ),
                       ),
-                      const SizedBox(height: 10),
+                      const SizedBox(height: 8),
                       Container(
                         padding: const EdgeInsets.symmetric(
-                          horizontal: 32,
-                          vertical: 16,
+                          horizontal: 24,
+                          vertical: 12,
                         ),
                         decoration: BoxDecoration(
-                          color: const Color(0xFFFFC107).withOpacity(0.2),
+                          color: AppColors.accent.withOpacity(0.2),
                           borderRadius: BorderRadius.circular(20),
-                          border: Border.all(
-                            color: const Color(0xFFFFC107),
-                            width: 2,
-                          ),
+                          border: Border.all(color: AppColors.accent, width: 2),
                         ),
                         child: Text(
                           '${result.totalScore}',
-                          style: const TextStyle(
+                          style: GoogleFonts.montserrat(
                             fontSize: 48,
                             fontWeight: FontWeight.bold,
-                            color: Color(0xFFFFC107),
+                            color: AppColors.accent,
                           ),
                         ),
                       ),
-                      const SizedBox(height: 30),
+                      const SizedBox(height: 16),
 
-                      // Divider
                       const Divider(thickness: 1.5),
-                      const SizedBox(height: 20),
+                      const SizedBox(height: 12),
 
-                      // Statistics
                       _buildStatRow(
                         icon: Icons.check_circle,
                         iconColor: Colors.green,
                         label: 'Benar',
                         value: '${result.correctAnswers}',
                       ),
-                      const SizedBox(height: 12),
+                      const SizedBox(height: 8),
                       _buildStatRow(
                         icon: Icons.cancel,
                         iconColor: Colors.red,
                         label: 'Salah',
                         value: '${result.wrongAnswers}',
                       ),
-                      const SizedBox(height: 12),
+                      const SizedBox(height: 8),
                       _buildStatRow(
                         icon: Icons.quiz,
-                        iconColor: const Color(0xFF4DB6AC),
+                        iconColor: AppColors.primary,
                         label: 'Total Soal',
                         value: '${result.totalQuestions}',
                       ),
-                      const SizedBox(height: 12),
+                      const SizedBox(height: 8),
                       _buildStatRow(
                         icon: Icons.timer,
                         iconColor: Colors.orange,
@@ -128,72 +134,32 @@ class ResultPage extends StatelessWidget {
                     ],
                   ),
                 ),
-                const SizedBox(height: 40),
+                const SizedBox(height: 24),
 
-                // Action buttons
-                Row(
-                  children: [
-                    // Back to home button
-                    Expanded(
-                      child: OutlinedButton.icon(
-                        onPressed: () {
-                          context.read<QuizProvider>().clearAll();
-                          Navigator.pushAndRemoveUntil(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) =>
-                                  const CategorySelectionPage(),
-                            ),
-                            (route) => false,
-                          );
-                        },
-                        icon: const Icon(Icons.home),
-                        label: const Text('Beranda'),
-                        style: OutlinedButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(vertical: 16),
-                          side: const BorderSide(
-                            color: Color(0xFF4DB6AC),
-                            width: 2,
-                          ),
-                          foregroundColor: const Color(0xFF4DB6AC),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(25),
-                          ),
-                        ),
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton.icon(
+                    onPressed: () {
+                      context.read<QuizProvider>().clearAll();
+                      Navigator.of(context).popUntil((route) => route.isFirst);
+                    },
+                    icon: const Icon(Icons.home),
+                    label: Text(
+                      'Kembali ke Beranda',
+                      style: GoogleFonts.montserrat(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
                       ),
                     ),
-                    const SizedBox(width: 12),
-
-                    // Retry button
-                    Expanded(
-                      child: ElevatedButton.icon(
-                        onPressed: () {
-                          final provider = context.read<QuizProvider>();
-                          provider.resetQuiz();
-                          provider.retryLoadQuestions();
-
-                          Navigator.pushAndRemoveUntil(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) =>
-                                  const CategorySelectionPage(),
-                            ),
-                            (route) => false,
-                          );
-                        },
-                        icon: const Icon(Icons.refresh),
-                        label: const Text('Coba Lagi'),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFF4DB6AC),
-                          foregroundColor: Colors.white,
-                          padding: const EdgeInsets.symmetric(vertical: 16),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(25),
-                          ),
-                        ),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.primary,
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(25),
                       ),
                     ),
-                  ],
+                  ),
                 ),
               ],
             ),
@@ -215,12 +181,12 @@ class ResultPage extends StatelessWidget {
         const SizedBox(width: 12),
         Text(
           label,
-          style: const TextStyle(fontSize: 16, color: Colors.black54),
+          style: GoogleFonts.montserrat(fontSize: 16, color: Colors.black),
         ),
         const Spacer(),
         Text(
           value,
-          style: const TextStyle(
+          style: GoogleFonts.montserrat(
             fontSize: 18,
             fontWeight: FontWeight.bold,
             color: Colors.black87,

@@ -1,14 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:budaya_indonesia/common/static/app_color.dart';
 
 class OptionButton extends StatelessWidget {
-  final String optionLetter; // A, B, C, D
+  final String optionLetter;
   final String optionText;
   final bool isSelected;
   final VoidCallback? onTap;
   final bool isReviewMode;
-  final bool? isCorrect; // For review mode
-  final bool showCorrect; // For live feedback (correct answer highlight)
-  final bool showWrong; // For live feedback (wrong answer highlight)
+  final bool? isCorrect;
+  final bool showCorrect;
+  final bool showWrong;
 
   const OptionButton({
     super.key,
@@ -24,27 +26,22 @@ class OptionButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Determine colors based on state
     Color backgroundColor;
     Color borderColor;
     Color textColor;
     Widget? trailingIcon;
 
-    // Priority: showCorrect/showWrong > isReviewMode > isSelected > default
     if (showCorrect) {
-      // Live feedback - correct answer
       backgroundColor = Colors.green.shade50;
       borderColor = Colors.green;
       textColor = Colors.green.shade900;
       trailingIcon = const Icon(Icons.check_circle, color: Colors.green);
     } else if (showWrong) {
-      // Live feedback - wrong answer
       backgroundColor = Colors.red.shade50;
       borderColor = Colors.red;
       textColor = Colors.red.shade900;
       trailingIcon = const Icon(Icons.cancel, color: Colors.red);
     } else if (isReviewMode && isCorrect != null) {
-      // Review mode - show correct/wrong
       if (isCorrect!) {
         backgroundColor = Colors.green.shade50;
         borderColor = Colors.green;
@@ -57,13 +54,11 @@ class OptionButton extends StatelessWidget {
         trailingIcon = const Icon(Icons.cancel, color: Colors.red);
       }
     } else if (isSelected) {
-      // Selected state
-      backgroundColor = const Color(0xFF4DB6AC); // Green tosca
-      borderColor = const Color(0xFF4DB6AC);
+      backgroundColor = AppColors.primary;
+      borderColor = AppColors.primary;
       textColor = Colors.white;
       trailingIcon = const Icon(Icons.check, color: Colors.white);
     } else {
-      // Default state
       backgroundColor = Colors.white;
       borderColor = Colors.black;
       textColor = Colors.black87;
@@ -86,7 +81,6 @@ class OptionButton extends StatelessWidget {
           ),
           child: Row(
             children: [
-              // Letter circle (A, B, C, D)
               Container(
                 width: 32,
                 height: 32,
@@ -113,11 +107,10 @@ class OptionButton extends StatelessWidget {
               ),
               const SizedBox(width: 12),
 
-              // Option text
               Expanded(
                 child: Text(
                   optionText,
-                  style: TextStyle(
+                  style: GoogleFonts.montserrat(
                     fontSize: 13,
                     fontWeight: FontWeight.w500,
                     color: textColor,
@@ -126,7 +119,6 @@ class OptionButton extends StatelessWidget {
                 ),
               ),
 
-              // Trailing icon (checkmark or status)
               if (trailingIcon != null) ...[
                 const SizedBox(width: 6),
                 SizedBox(width: 20, height: 20, child: trailingIcon),

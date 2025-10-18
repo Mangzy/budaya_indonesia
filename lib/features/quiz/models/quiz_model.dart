@@ -75,6 +75,20 @@ class QuizQuestion {
     return null;
   }
 
+  QuizQuestion shuffleOptions() {
+    final shuffledOptions = List<String>.from(options);
+    shuffledOptions.shuffle();
+
+    return QuizQuestion(
+      id: id,
+      category: category,
+      question: question,
+      options: shuffledOptions,
+      correctAnswer: correctAnswer,
+      imageUrl: imageUrl,
+    );
+  }
+
   @override
   String toString() {
     return 'QuizQuestion(id: $id, category: $category, question: $question, hasImage: ${imageUrl != null})';
@@ -149,24 +163,6 @@ class QuizResult {
       timeTaken: duration,
       completedAt: endTime,
     );
-  }
-
-  String get grade {
-    if (scorePercentage >= 90) return 'Excellent';
-    if (scorePercentage >= 80) return 'Very Good';
-    if (scorePercentage >= 70) return 'Good';
-    if (scorePercentage >= 60) return 'Fair';
-    if (scorePercentage >= 50) return 'Pass';
-    return 'Need Improvement';
-  }
-
-  String get emoji {
-    if (scorePercentage >= 90) return '🏆';
-    if (scorePercentage >= 80) return '🌟';
-    if (scorePercentage >= 70) return '👍';
-    if (scorePercentage >= 60) return '😊';
-    if (scorePercentage >= 50) return '😐';
-    return '😢';
   }
 
   String get formattedTime {

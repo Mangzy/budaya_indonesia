@@ -16,6 +16,8 @@ import 'package:budaya_indonesia/features/login/providers/login_provider.dart';
 import 'package:budaya_indonesia/features/profile/providers/profile_provider.dart';
 import 'package:budaya_indonesia/features/profile/pages/profile_page.dart';
 import 'package:budaya_indonesia/features/register/pages/register_page.dart';
+import 'package:budaya_indonesia/features/quiz/pages/quiz_page.dart';
+import 'package:budaya_indonesia/features/quiz/providers/quiz_provider.dart';
 import 'package:flutter/material.dart';
 
 import 'package:firebase_core/firebase_core.dart';
@@ -75,6 +77,9 @@ class _MainAppState extends State<MainApp> {
           create: (_) =>
               PakaianProvider(client: Supabase.instance.client)..refresh(),
         ),
+        ChangeNotifierProvider(
+          create: (_) => QuizProvider(client: Supabase.instance.client),
+        ),
       ],
       child: Builder(
         builder: (context) {
@@ -111,6 +116,7 @@ class _MainAppState extends State<MainApp> {
                     '/profile': (context) => const ProfilePage(),
                     '/profile/edit': (context) => const EditProfilePage(),
                     '/ar': (context) => const ArPage(),
+                    '/quiz': (context) => const QuizPage(),
                   },
                 );
               },

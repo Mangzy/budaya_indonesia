@@ -88,10 +88,13 @@ class QuizProvider extends ChangeNotifier {
       final shuffled = List<QuizQuestion>.from(allQuestions);
       shuffled.shuffle(math.Random());
 
-      final selectedQuestions = shuffled.take(10).toList();
+      final selectedQuestions = shuffled
+          .take(10)
+          .map((question) => question.shuffleOptions())
+          .toList();
 
       dev.log(
-        'Terpilih ${selectedQuestions.length} soal acak',
+        'Terpilih ${selectedQuestions.length} soal acak dengan opsi yang diacak',
         name: 'QuizProvider',
       );
 
@@ -250,6 +253,10 @@ class QuizProvider extends ChangeNotifier {
 
     final endTime = DateTime.now();
     final startTime = _quizStartTime ?? endTime;
+
+    if (_selectedCategory == null) {
+      throw Exception('Quiz category tidak boleh null saat submit');
+    }
 
     final result = QuizResult.calculate(
       category: _selectedCategory!,
