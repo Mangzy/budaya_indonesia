@@ -1,10 +1,11 @@
-import 'package:budaya_indonesia/src/auth_provider.dart';
+import 'package:budaya_indonesia/src/auth_provider.dart' as app_auth;
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import '../providers/login_provider.dart';
 import '../widgets/primary_button.dart';
 import '../widgets/google_button.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class LoginPages extends StatefulWidget {
   const LoginPages({super.key});
@@ -18,6 +19,18 @@ class _LoginPagesState extends State<LoginPages> {
   late final TextEditingController _emailController;
   late final TextEditingController _passwordController;
   bool _controllersInitialized = false;
+
+  @override
+  void initState() {
+    super.initState();
+    // If already signed-in (Firebase persisted session), skip login screen
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final user = FirebaseAuth.instance.currentUser;
+      if (mounted && user != null) {
+        Navigator.pushNamedAndRemoveUntil(context, '/navbar', (r) => false);
+      }
+    });
+  }
 
   @override
   void dispose() {
@@ -165,7 +178,9 @@ class _LoginPagesState extends State<LoginPages> {
                                                   .trim();
                                               if (email.contains('@')) {
                                                 await context
-                                                    .read<AuthProvider>()
+                                                    .read<
+                                                      app_auth.AuthProvider
+                                                    >()
                                                     .sendResetEmail(email);
                                                 if (!mounted) return;
                                                 ScaffoldMessenger.of(

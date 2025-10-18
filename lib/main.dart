@@ -16,6 +16,8 @@ import 'package:budaya_indonesia/features/login/providers/login_provider.dart';
 import 'package:budaya_indonesia/features/profile/providers/profile_provider.dart';
 import 'package:budaya_indonesia/features/profile/pages/profile_page.dart';
 import 'package:budaya_indonesia/features/register/pages/register_page.dart';
+import 'package:budaya_indonesia/features/splash/pages/splash_page.dart';
+import 'package:budaya_indonesia/features/ar/providers/ar_assets_provider.dart';
 import 'package:flutter/material.dart';
 
 import 'package:firebase_core/firebase_core.dart';
@@ -26,7 +28,6 @@ import 'firebase_options.dart';
 import 'features/home/providers/pakaian_provider.dart';
 import 'package:budaya_indonesia/features/music/providers/music_list_provider.dart';
 import 'package:budaya_indonesia/features/music/providers/music_player_provider.dart';
-import 'package:budaya_indonesia/features/splash/pages/splash_page.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -72,6 +73,10 @@ class _MainAppState extends State<MainApp> {
         ),
         ChangeNotifierProvider(create: (_) => MusicPlayerProvider()),
         ChangeNotifierProvider(create: (_) => ArProvider()),
+        ChangeNotifierProvider(
+          create: (_) =>
+              ArAssetsProvider(client: Supabase.instance.client)..refresh(),
+        ),
         ChangeNotifierProvider(
           create: (_) =>
               PakaianProvider(client: Supabase.instance.client)..refresh(),
