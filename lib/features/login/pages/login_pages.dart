@@ -137,6 +137,7 @@ class _LoginPagesState extends State<LoginPages> {
                                   const _FieldLabel('Email'),
                                   _PillField(
                                     controller: _emailController,
+                                    hintText: 'Masukkan email',
                                     validator: (v) =>
                                         (v ?? '').trim().contains('@')
                                         ? null
@@ -146,6 +147,7 @@ class _LoginPagesState extends State<LoginPages> {
                                   const _FieldLabel('Password'),
                                   _PillField(
                                     controller: _passwordController,
+                                    hintText: 'Masukkan kata sandi',
                                     obscure: true,
                                     enableToggle: true,
                                     validator: (v) => (v ?? '').length >= 6
@@ -214,6 +216,13 @@ class _LoginPagesState extends State<LoginPages> {
                                                     ),
                                                   ),
                                                 );
+                                              } else {
+                                                if (!mounted) return;
+                                                Navigator.pushNamedAndRemoveUntil(
+                                                  context,
+                                                  '/navbar',
+                                                  (route) => false,
+                                                );
                                               }
                                             } catch (e) {
                                               // ignore: use_build_context_synchronously
@@ -258,7 +267,28 @@ class _LoginPagesState extends State<LoginPages> {
                                   GoogleButton(
                                     onPressed: vm.loadingSignInWithGoogle
                                         ? null
-                                        : vm.signInWithGoogle,
+                                        : () async {
+                                            await vm.signInWithGoogle();
+                                            if (vm.errorMessage != null) {
+                                              if (!mounted) return;
+                                              ScaffoldMessenger.of(
+                                                context,
+                                              ).showSnackBar(
+                                                SnackBar(
+                                                  content: Text(
+                                                    vm.errorMessage!,
+                                                  ),
+                                                ),
+                                              );
+                                            } else {
+                                              if (!mounted) return;
+                                              Navigator.pushNamedAndRemoveUntil(
+                                                context,
+                                                '/navbar',
+                                                (route) => false,
+                                              );
+                                            }
+                                          },
                                   ),
                                   const SizedBox(height: 10),
                                   GestureDetector(
@@ -268,8 +298,8 @@ class _LoginPagesState extends State<LoginPages> {
                                     ),
                                     child: RichText(
                                       textAlign: TextAlign.center,
-                                      text: const TextSpan(
-                                        style: TextStyle(
+                                      text: TextSpan(
+                                        style: GoogleFonts.montserrat(
                                           fontSize: 13,
                                           color: Colors.black87,
                                         ),
@@ -310,11 +340,13 @@ class _PillField extends StatefulWidget {
   final bool obscure;
   final bool enableToggle;
   final String? Function(String?)? validator;
+  final String? hintText;
   const _PillField({
     required this.controller,
     this.obscure = false,
     this.enableToggle = false,
     this.validator,
+    this.hintText,
   });
   @override
   State<_PillField> createState() => _PillFieldState();
@@ -340,6 +372,8 @@ class _PillFieldState extends State<_PillField> {
       obscureText: widget.obscure ? _hide : false,
       validator: widget.validator,
       decoration: InputDecoration(
+        hintText: widget.hintText,
+        hintStyle: TextStyle(color: Colors.grey.shade500, fontSize: 13),
         filled: true,
         fillColor: Colors.white,
         contentPadding: const EdgeInsets.symmetric(

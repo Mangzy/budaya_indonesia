@@ -26,6 +26,7 @@ import 'firebase_options.dart';
 import 'features/home/providers/pakaian_provider.dart';
 import 'package:budaya_indonesia/features/music/providers/music_list_provider.dart';
 import 'package:budaya_indonesia/features/music/providers/music_player_provider.dart';
+import 'package:budaya_indonesia/features/splash/pages/splash_page.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -88,13 +89,9 @@ class _MainAppState extends State<MainApp> {
                   theme: AppTheme.light,
                   darkTheme: AppTheme.dark,
                   themeMode: isDark ? ThemeMode.dark : ThemeMode.light,
-                  home: Consumer<AuthProvider>(
-                    builder: (context, auth, _) {
-                      if (auth.user == null) return const LoginPages();
-                      return const BottomNavbar();
-                    },
-                  ),
+                  home: const SplashPage(),
                   routes: {
+                    '/splash': (context) => const SplashPage(),
                     '/login': (context) => const LoginPages(),
                     '/register': (context) => const RegisterPage(),
                     '/home': (context) => const HomePage(),

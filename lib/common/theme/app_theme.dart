@@ -3,84 +3,81 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class AppTheme {
-  static ThemeData light = ThemeData(
-    brightness: Brightness.light,
-    primaryColor: AppColors.primary,
-    fontFamily: GoogleFonts.montserrat().fontFamily,
-    textTheme: GoogleFonts.montserratTextTheme(),
-    colorScheme: ColorScheme.fromSwatch(
-      primarySwatch: Colors.teal,
-    ).copyWith(primary: AppColors.primary, secondary: AppColors.accent),
-    appBarTheme: AppBarTheme(
-      backgroundColor: AppColors.primary,
-      foregroundColor: Colors.white,
-      elevation: 0,
-    ),
-    floatingActionButtonTheme: FloatingActionButtonThemeData(
-      backgroundColor: AppColors.accent,
-    ),
-    iconTheme: IconThemeData(
-      color: Color.alphaBlend(Colors.black.withOpacity(.35), AppColors.primary),
-    ),
-    switchTheme: SwitchThemeData(
-      thumbColor: MaterialStateProperty.resolveWith((states) {
-        if (states.contains(MaterialState.selected)) {
-          return AppColors.primary;
-        }
-        return Colors.white;
-      }),
-      trackColor: MaterialStateProperty.resolveWith((states) {
-        if (states.contains(MaterialState.selected)) {
-          return AppColors.primary.withOpacity(0.55);
-        }
-        return Colors.grey.shade300;
-      }),
-      trackOutlineColor: MaterialStateProperty.resolveWith((states) {
-        if (states.contains(MaterialState.selected)) {
-          return AppColors.primary.withOpacity(0.8);
-        }
-        return Colors.grey.shade400;
-      }),
-    ),
-    buttonTheme: ButtonThemeData(
-      buttonColor: AppColors.primary,
-      textTheme: ButtonTextTheme.primary,
-    ),
-  );
+  static ThemeData light = _buildTheme(Brightness.light);
+  static ThemeData dark = _buildTheme(Brightness.dark);
 
-  static ThemeData dark = ThemeData(
-    brightness: Brightness.dark,
-    primaryColor: AppColors.primary,
-    fontFamily: GoogleFonts.montserrat().fontFamily,
-    textTheme: GoogleFonts.montserratTextTheme(ThemeData.dark().textTheme),
-    colorScheme: ColorScheme.fromSwatch(
-      primarySwatch: Colors.teal,
-      brightness: Brightness.dark,
-    ).copyWith(primary: AppColors.primary, secondary: AppColors.accent),
-    appBarTheme: AppBarTheme(
-      backgroundColor: AppColors.primary,
-      foregroundColor: Colors.white,
-      elevation: 0,
-    ),
-    floatingActionButtonTheme: FloatingActionButtonThemeData(
-      backgroundColor: AppColors.accent,
-    ),
-    iconTheme: IconThemeData(color: AppColors.primary),
-    switchTheme: SwitchThemeData(
-      thumbColor: MaterialStateProperty.resolveWith((states) {
-        if (states.contains(MaterialState.selected)) return AppColors.accent;
-        return Colors.grey.shade400;
-      }),
-      trackColor: MaterialStateProperty.resolveWith((states) {
-        if (states.contains(MaterialState.selected))
-          return AppColors.accent.withOpacity(.5);
-        return Colors.grey.shade700;
-      }),
-      trackOutlineColor: MaterialStateProperty.all(Colors.transparent),
-    ),
-    buttonTheme: ButtonThemeData(
-      buttonColor: AppColors.primary,
-      textTheme: ButtonTextTheme.primary,
-    ),
-  );
+  static ThemeData _buildTheme(Brightness brightness) {
+    final isDark = brightness == Brightness.dark;
+    final base = ThemeData(brightness: brightness);
+    final scheme = ColorScheme.fromSeed(
+      seedColor: AppColors.primary,
+      brightness: brightness,
+    );
+
+    final textTheme = GoogleFonts.montserratTextTheme(
+      isDark ? base.textTheme : base.textTheme,
+    );
+
+    return base.copyWith(
+      colorScheme: scheme.copyWith(
+        primary: AppColors.primary,
+        secondary: AppColors.accent,
+      ),
+      primaryColor: AppColors.primary,
+      scaffoldBackgroundColor: isDark ? scheme.surface : AppColors.tertiary,
+      textTheme: textTheme,
+      appBarTheme: AppBarTheme(
+        backgroundColor: isDark ? Colors.transparent : AppColors.tertiary,
+        foregroundColor: isDark ? scheme.onSurface : Colors.black,
+        elevation: 0,
+        surfaceTintColor: Colors.transparent,
+      ),
+      cardTheme: CardThemeData(
+        color: scheme.surface,
+        elevation: 0,
+        surfaceTintColor: Colors.transparent,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      ),
+      floatingActionButtonTheme: FloatingActionButtonThemeData(
+        backgroundColor: AppColors.accent,
+        foregroundColor: Colors.black,
+      ),
+      iconTheme: IconThemeData(
+        color: isDark
+            ? scheme.onSurfaceVariant
+            : Color.alphaBlend(
+                Colors.black.withOpacity(.35),
+                AppColors.primary,
+              ),
+      ),
+      switchTheme: SwitchThemeData(
+        thumbColor: MaterialStateProperty.resolveWith((states) {
+          final selected = states.contains(MaterialState.selected);
+          return selected
+              ? AppColors.accent
+              : (isDark ? Colors.grey[400] : Colors.white);
+        }),
+        trackColor: MaterialStateProperty.resolveWith((states) {
+          final selected = states.contains(MaterialState.selected);
+          if (selected)
+            return (isDark ? AppColors.accent : AppColors.primary).withOpacity(
+              .5,
+            );
+          return isDark ? Colors.grey.shade700 : Colors.grey.shade300;
+        }),
+        trackOutlineColor: MaterialStateProperty.resolveWith((states) {
+          final selected = states.contains(MaterialState.selected);
+          if (selected)
+            return (isDark ? AppColors.accent : AppColors.primary).withOpacity(
+              .8,
+            );
+          return isDark ? Colors.transparent : Colors.grey.shade400;
+        }),
+      ),
+      buttonTheme: ButtonThemeData(
+        buttonColor: AppColors.primary,
+        textTheme: ButtonTextTheme.primary,
+      ),
+    );
+  }
 }
