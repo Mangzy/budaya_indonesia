@@ -1,3 +1,4 @@
+import 'package:budaya_indonesia/clothes/pages/pakaian_daerah_page.dart';
 import 'package:budaya_indonesia/features/ar/pages/ar_page.dart';
 import 'package:budaya_indonesia/features/home/pages/home_page.dart';
 import 'package:budaya_indonesia/features/music/pages/music_page.dart';
@@ -6,8 +7,7 @@ import 'package:budaya_indonesia/features/profile/pages/profile_page.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-// using Material icons for the bottom navigation
-/// Bottom navigation bar using Material icons with 5 pages.
+/// Bottom navigation bar with 5 main pages.
 class BottomNavbar extends StatefulWidget {
   final int? currentIndex;
   final ValueChanged<int>? onTap;
@@ -21,7 +21,6 @@ class BottomNavbar extends StatefulWidget {
 class _BottomNavbarState extends State<BottomNavbar> {
   late int _selectedIndex;
 
-  // Use plain IconData for the bottom navigation
   final List<IconData> _tabIcons = [
     Icons.home,
     Icons.audiotrack,
@@ -31,38 +30,12 @@ class _BottomNavbarState extends State<BottomNavbar> {
   ];
 
   final List<Widget> _pages = [
-    // Home
-    HomePage(),
-    MusicPage(),
-    Scaffold(
-      appBar: AppBar(title: const Text('')),
-      body: const Center(child: Text('Quiz page')),
-    ),
-    Scaffold(
-      appBar: AppBar(title: const Text('')),
-      body: const Center(child: Text('Clothes page')),
-    ),
-    ProfilePage(),
+    const HomePage(),
+    const MusicPage(),
+    const SizedBox.shrink(), // placeholder for AR button
+    const PakaianDaerahPage(),
+    const ProfilePage(),
   ];
-  void _onItemTapped(int index) {
-    if (index == 2) {
-      // Navigasi ke halaman AR dan hilangkan navbar
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (_) => const ArPage(), // buka ARPage di route baru
-        ),
-      );
-      return;
-    }
-    setState(() => _selectedIndex = index);
-    if (widget.onTap != null) {
-      widget.onTap!(index);
-    } else {
-      final prov = context.read<NavbarProvider?>();
-      prov?.setIndex(index);
-    }
-  }
 
   @override
   void initState() {
@@ -70,23 +43,41 @@ class _BottomNavbarState extends State<BottomNavbar> {
     _selectedIndex = widget.currentIndex ?? 0;
   }
 
+  void _onItemTapped(int index) {
+    if (index == 2) {
+      // Navigate to AR page on tap
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (_) => const ArPage()),
+      );
+      return;
+    }
+
+    setState(() => _selectedIndex = index);
+    if (widget.onTap != null) {
+      widget.onTap!(index);
+    } else {
+      context.read<NavbarProvider?>()?.setIndex(index);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    final prov = Provider.of<NavbarProvider?>(context);
+    final prov = context.watch<NavbarProvider?>();
     final displayIndex = prov?.index ?? _selectedIndex;
     final bottomInset = MediaQuery.of(context).padding.bottom;
-    // Fixed visual height for the custom nav; keep in sync with SizedBox below
+
     const navHeight = 84.0;
-    // Reserve space so page content isn't hidden behind the floating navbar
-    // Add a small extra buffer to account for elevation/shadow and device variations
-    final reservedBottom =
-        navHeight + 20 /*buffer*/ + 12 /*outer bottom pad*/ + bottomInset;
+    final reservedBottom = navHeight + 20 + 12 + bottomInset;
 
     return Scaffold(
-      extendBody: true, // let page background flow under nav shape
+      extendBody: true,
       body: Padding(
         padding: EdgeInsets.only(bottom: reservedBottom),
-        child: IndexedStack(index: displayIndex, children: _pages),
+        child: IndexedStack(
+          index: displayIndex,
+          children: _pages,
+        ),
       ),
       bottomNavigationBar: SafeArea(
         bottom: true,
@@ -96,14 +87,15 @@ class _BottomNavbarState extends State<BottomNavbar> {
             height: navHeight,
             child: Material(
               elevation: 8,
-              // use app theme primary so navbar follows ThemeData in main.dart
               color: Theme.of(context).colorScheme.primary,
               borderRadius: BorderRadius.circular(24),
-              child: Container(
-                padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 8),
+              child: Padding(
+                padding:
+                    const EdgeInsets.symmetric(vertical: 6, horizontal: 8),
                 child: Row(
                   children: List.generate(_tabIcons.length, (i) {
                     final isActive = i == displayIndex;
+                    final colorScheme = Theme.of(context).colorScheme;
 
                     return Expanded(
                       child: InkWell(
@@ -113,17 +105,13 @@ class _BottomNavbarState extends State<BottomNavbar> {
                           padding: const EdgeInsets.symmetric(vertical: 6),
                           child: Column(
                             mainAxisSize: MainAxisSize.min,
-                            mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               Icon(
                                 _tabIcons[i],
                                 size: isActive ? 30 : 24,
                                 color: isActive
-                                    ? Theme.of(context).colorScheme.onPrimary
-                                    : Theme.of(
-                                        context,
-                                        // ignore: deprecated_member_use
-                                      ).colorScheme.onPrimary.withOpacity(0.85),
+                                    ? colorScheme.onPrimary
+                                    : colorScheme.onPrimary.withOpacity(0.85),
                               ),
                               const SizedBox(height: 4),
                               Text(
@@ -131,13 +119,8 @@ class _BottomNavbarState extends State<BottomNavbar> {
                                 style: TextStyle(
                                   fontSize: 11,
                                   color: isActive
-                                      ? Theme.of(context).colorScheme.onPrimary
-                                      : Theme.of(
-                                          context,
-                                          // ignore: deprecated_member_use
-                                        ).colorScheme.onPrimary.withOpacity(
-                                          0.85,
-                                        ),
+                                      ? colorScheme.onPrimary
+                                      : colorScheme.onPrimary.withOpacity(0.85),
                                 ),
                               ),
                             ],
