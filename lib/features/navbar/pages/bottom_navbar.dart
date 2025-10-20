@@ -1,3 +1,4 @@
+import 'package:budaya_indonesia/clothes/pages/pakaian_daerah_page.dart';
 import 'package:budaya_indonesia/features/ar/pages/ar_page.dart';
 import 'package:budaya_indonesia/features/home/pages/home_page.dart';
 import 'package:budaya_indonesia/features/music/pages/music_page.dart';
@@ -34,19 +35,17 @@ class _BottomNavbarState extends State<BottomNavbar> {
     // Home
     HomePage(),
     MusicPage(),
-    Scaffold(
-      appBar: AppBar(title: const Text('')),
-      body: const Center(child: Text('Quiz page')),
-    ),
+    const SizedBox.shrink(), 
+    PakaianDaerahPage(),
     ProfilePage(),
   ];
   void _onItemTapped(int index) {
     if (index == 2) {
-    // Navigasi ke halaman AR dan hilangkan navbar
+ 
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (_) => const ArPage(), // buka ARPage di route baru
+        builder: (_) => const ArPage(), 
       ),
     );
     return;

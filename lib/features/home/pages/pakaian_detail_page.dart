@@ -1,4 +1,6 @@
+import 'package:budaya_indonesia/common/static/app_color.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../models/pakaian_daerah.dart';
 
 class PakaianDetailPage extends StatelessWidget {
@@ -7,184 +9,149 @@ class PakaianDetailPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
+    final size = MediaQuery.of(context).size;
+
     return Scaffold(
-      body: CustomScrollView(
-        slivers: [
-          SliverAppBar(
-            pinned: true,
-            stretch: true,
-            expandedHeight: 260,
-            title: Text(item.nama),
-            flexibleSpace: FlexibleSpaceBar(
-              stretchModes: const [
-                StretchMode.zoomBackground,
-                StretchMode.blurBackground,
-              ],
-              background: Stack(
-                fit: StackFit.expand,
-                children: [
-                  _HeaderImage(url: item.imageUrl),
-                  // Gradient overlay for better text contrast
-                  const DecoratedBox(
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        begin: Alignment.bottomCenter,
-                        end: Alignment.topCenter,
-                        colors: [
-                          Color(0xAA000000),
-                          Color(0x33000000),
-                          Color(0x00000000),
-                        ],
-                      ),
-                    ),
-                  ),
-                  Positioned(
-                    left: 16,
-                    right: 16,
-                    bottom: 16,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        _ProvinceChip(text: item.asal),
-                        // Optional secondary action slot
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),
+      backgroundColor: AppColors.tertiary,
+      appBar: AppBar(
+        backgroundColor: AppColors.tertiary,
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(
+            Icons.arrow_back_ios_new,
+            color: Colors.black87,
+            size: 20,
           ),
-          SliverToBoxAdapter(
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    item.nama,
-                    style: theme.textTheme.headlineSmall?.copyWith(
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  Text(
-                    item.deskripsi,
-                    style: theme.textTheme.bodyLarge?.copyWith(height: 1.6),
-                  ),
-                  if (item.funFact != null && item.funFact!.isNotEmpty) ...[
-                    const SizedBox(height: 20),
-                    Card(
-                      elevation: 0,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        side: BorderSide(
-                          color: theme.colorScheme.outlineVariant,
-                        ),
-                      ),
-                      child: Padding(
-                        padding: const EdgeInsets.all(12.0),
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            const Padding(
-                              padding: EdgeInsets.only(top: 2.0),
-                              child: Icon(
-                                Icons.tips_and_updates,
-                                color: Colors.amber,
-                              ),
-                            ),
-                            const SizedBox(width: 12),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    'Fun fact',
-                                    style: theme.textTheme.titleMedium
-                                        ?.copyWith(fontWeight: FontWeight.w600),
-                                  ),
-                                  const SizedBox(height: 6),
-                                  Text(
-                                    item.funFact!,
-                                    style: theme.textTheme.bodyMedium?.copyWith(
-                                      height: 1.5,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ],
-                ],
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _HeaderImage extends StatelessWidget {
-  final String? url;
-  const _HeaderImage({required this.url});
-
-  @override
-  Widget build(BuildContext context) {
-    if (url == null || url!.isEmpty) {
-      return Container(
-        color: Colors.teal.shade200,
-        child: const Center(
-          child: Icon(Icons.image, size: 64, color: Colors.white70),
+          onPressed: () => Navigator.pop(context),
         ),
-      );
-    }
-    return Image.network(
-      url!,
-      fit: BoxFit.cover,
-      loadingBuilder: (c, child, progress) {
-        if (progress == null) return child;
-        return Container(
-          color: Colors.black12,
-          child: const Center(child: CircularProgressIndicator(strokeWidth: 2)),
-        );
-      },
-      errorBuilder: (c, e, st) => Container(
-        color: Colors.black12,
-        child: const Center(child: Icon(Icons.broken_image, size: 48)),
+        centerTitle: true,
+        title: Text(
+          'Detail Pakaian',
+          style: GoogleFonts.montserrat(
+            fontWeight: FontWeight.bold,
+            fontSize: 18,
+            color: Colors.black,
+          ),
+        ),
       ),
-    );
-  }
-}
-
-class _ProvinceChip extends StatelessWidget {
-  final String text;
-  const _ProvinceChip({required this.text});
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-      decoration: BoxDecoration(
-        color: Colors.black.withOpacity(.35),
-        borderRadius: BorderRadius.circular(999),
-        border: Border.all(color: Colors.white24),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
+      body: Stack(
         children: [
-          const Icon(Icons.place, size: 16, color: Colors.white),
-          const SizedBox(width: 6),
-          Text(
-            text,
-            style: theme.textTheme.labelLarge?.copyWith(
-              color: Colors.white,
-              fontWeight: FontWeight.w600,
+          //Gambar pakaian
+          Positioned(
+            top: 12,
+            left: 24,
+            right: 24,
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(20),
+              child: Image.network(
+                item.imageUrl ??
+                    'https://via.placeholder.com/400?text=No+Image',
+                width: double.infinity,
+                height: size.height * 0.35,
+                fit: BoxFit.contain, // biar gak kepotong
+                loadingBuilder: (context, child, progress) {
+                  if (progress == null) return child;
+                  return Container(
+                    height: size.height * 0.35,
+                    alignment: Alignment.center,
+                    color: Colors.white,
+                    child: const CircularProgressIndicator(strokeWidth: 2),
+                  );
+                },
+                errorBuilder: (context, error, stackTrace) => Container(
+                  height: size.height * 0.35,
+                  color: Colors.grey.shade200,
+                  alignment: Alignment.center,
+                  child: const Icon(Icons.image_not_supported, size: 40),
+                ),
+              ),
+            ),
+          ),
+
+          //deskripsi
+          Positioned(
+            top: size.height * 0.45,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 26),
+              decoration: BoxDecoration(
+                color: AppColors.secondary,
+                borderRadius: const BorderRadius.only(
+                  topLeft: Radius.circular(32),
+                  topRight: Radius.circular(32),
+                ),
+              ),
+              child: SingleChildScrollView(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Nama pakaian
+                    Text(
+                      item.nama,
+                      style: GoogleFonts.montserrat(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 20,
+                      ),
+                    ),
+                    const SizedBox(height: 6),
+
+                    // Asal daerah
+                    Text(
+                      "Asal ${item.asal}",
+                      style: GoogleFonts.montserrat(
+                        color: Colors.white.withValues(alpha: 0.9),
+                        fontSize: 13,
+                      ),
+                    ),
+                    const SizedBox(height: 18),
+
+                    // Deskripsi
+                    Text(
+                      "Deskripsi",
+                      style: GoogleFonts.montserrat(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w600,
+                        fontSize: 14,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      item.deskripsi,
+                      textAlign: TextAlign.justify,
+                      style: GoogleFonts.montserrat(
+                        color: Colors.white.withValues(alpha: 0.95),
+                        fontSize: 13,
+                        height: 1.6,
+                      ),
+                    ),
+
+                    if (item.funFact != null && item.funFact!.isNotEmpty) ...[
+                      const SizedBox(height: 18),
+                      Text(
+                        "FUN FACT",
+                        style: GoogleFonts.montserrat(
+                          color: Colors.white,
+                          fontWeight: FontWeight.w600,
+                          fontSize: 14,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        item.funFact!,
+                        textAlign: TextAlign.justify,
+                        style: GoogleFonts.montserrat(
+                          color: Colors.white.withValues(alpha: 0.95),
+                          fontSize: 13,
+                          height: 1.6,
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
+              ),
             ),
           ),
         ],
