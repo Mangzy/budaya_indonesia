@@ -16,7 +16,7 @@ class PakaianCardWidget extends StatelessWidget {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) =>PakaianDetailPage(item: pakaian),
+            builder: (context) => PakaianDetailPage(item: pakaian),
           ),
         );
       },
@@ -50,13 +50,14 @@ class PakaianCardWidget extends StatelessWidget {
                     bottom: Radius.circular(16),
                   ),
                 ),
-                margin: const EdgeInsets.only(bottom: 4), 
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                margin: const EdgeInsets.only(bottom: 4),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 10,
+                ),
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -84,11 +85,16 @@ class PakaianCardWidget extends StatelessWidget {
                       ),
                     ),
 
-
                     GestureDetector(
                       onTap: () {
-                        Navigator.pushNamed(context, '/ar',
-                            arguments: pakaian);
+                        Navigator.pushNamed(
+                          context,
+                          '/ar/2d',
+                          arguments: {
+                            'pakaianId': pakaian.id,
+                            'pakaianNama': pakaian.nama,
+                          },
+                        );
                       },
                       child: Container(
                         width: 32,

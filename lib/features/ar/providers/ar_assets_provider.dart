@@ -99,7 +99,17 @@ class ArAssetsProvider extends ChangeNotifier {
           }
         }
 
-        result.add(ArModelItem(name: _fileName(p), url: url, iosUrl: iosUrl));
+        // Try to find a sibling thumbnail image for gallery previews
+        final thumbUrl = await _findSiblingImageUrl(storage, p, isPublic);
+
+        result.add(
+          ArModelItem(
+            name: _fileName(p),
+            url: url,
+            iosUrl: iosUrl,
+            thumbnailUrl: thumbUrl,
+          ),
+        );
       }
 
       items = result;
@@ -167,5 +177,56 @@ class ArAssetsProvider extends ChangeNotifier {
   String? _siblingUsdzPath(String glbPath) {
     if (!glbPath.toLowerCase().endsWith('.glb')) return null;
     return glbPath.substring(0, glbPath.length - 4) + '.usdz';
+  }
+
+  Future<String?> _findSiblingImageUrl(
+    StorageFileApi storage,
+    String glbPath,
+    bool isPublic,
+  ) async {
+    final imageExts = ['.png', '.jpg', '.jpeg', '.webp'];
+    final base = _fileName(
+      glbPath,
+    ).replaceAll(RegExp(r'\.glb$', caseSensitive: false), '');
+    final dir = glbPath.contains('/')
+        ? glbPath.substring(0, glbPath.lastIndexOf('/'))
+        : '';
+    try {
+      final entries = await storage.list(path: dir);
+      String? found;
+      for (final ext in imageExts) {
+        final name = '$base$ext';
+        final has = entries.any((e) => e.name.toLowerCase() == name);
+        if (has) {
+          found = dir.isEmpty ? name : '$dir/$name';
+          break;
+        }
+      }
+      // try thumbnails subfolder
+      if (found == null) {
+        final thumbsDir = dir.isEmpty ? 'thumbnails' : '$dir/thumbnails';
+        try {
+          final thumbs = await storage.list(path: thumbsDir);
+          for (final ext in imageExts) {
+            final name = '$base$ext';
+            final has = thumbs.any((e) => e.name.toLowerCase() == name);
+            if (has) {
+              found = '$thumbsDir/$name';
+              break;
+            }
+          }
+        } catch (_) {}
+      }
+
+      if (found != null) {
+        if (isPublic) return storage.getPublicUrl(found);
+        try {
+          return await storage.createSignedUrl(found, 3600);
+        } catch (_) {
+          return null;
+        }
+      }
+    } catch (_) {}
+    return null;
   }
 }

@@ -23,9 +23,11 @@ dependencies:
   http: ^1.2.1
   camera: ^0.11.2
   image_picker: ^1.1.2
+  path_provider: ^2.1.4
   flutter_svg: ^2.2.1
   path_drawing: ^1.0.1
   model_viewer_plus: ^1.9.1
+  arkit_plugin: ^1.0.8
 
 dev_dependencies:
   flutter_test:

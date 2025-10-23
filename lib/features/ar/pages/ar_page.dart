@@ -1,10 +1,5 @@
-import 'package:budaya_indonesia/features/ar/providers/ar_provider.dart';
 import 'package:budaya_indonesia/features/ar/providers/ar_assets_provider.dart';
-import 'package:budaya_indonesia/features/ar/widgets/ar_button_widget.dart';
-import 'package:budaya_indonesia/features/ar/widgets/ar_guide_bottom_sheet.dart';
-import 'package:budaya_indonesia/features/ar/widgets/ar_overlay_widget.dart';
 import 'package:budaya_indonesia/features/ar/pages/ar_model_viewer_page.dart';
-import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -16,295 +11,198 @@ class ArPage extends StatefulWidget {
 }
 
 class _ArPageState extends State<ArPage> {
-  CameraController? _controller;
-  late Future<void> _initializeControllerFuture;
   String? _selectedModelName;
 
   @override
-  void initState() {
-    super.initState();
-    _initializeCamera(isFront: true);
-  }
-
-  Future<void> _initializeCamera({required bool isFront}) async {
-    final provider = context.read<ArProvider>();
-    final cameras = await availableCameras();
-
-    final frontCamera = cameras.firstWhere(
-      (cam) => cam.lensDirection == CameraLensDirection.front,
-      orElse: () => cameras.first,
-    );
-
-    final backCamera = cameras.firstWhere(
-      (cam) => cam.lensDirection == CameraLensDirection.back,
-      orElse: () => cameras.first,
-    );
-
-    final selectedCamera = isFront ? frontCamera : backCamera;
-
-    _controller = CameraController(selectedCamera, ResolutionPreset.high);
-    _initializeControllerFuture = _controller!.initialize();
-    await _initializeControllerFuture;
-    provider.setFrontCamera(isFront);
-    if (mounted) setState(() {});
-  }
-
-  @override
-  void dispose() {
-    _controller?.dispose();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
-    final provider = context.watch<ArProvider>();
-    final assets = context.watch<ArAssetsProvider>();
+    final assets3d = context.watch<ArAssetsProvider>();
 
     // Set default selected model when list becomes available
     if ((_selectedModelName == null ||
-            !assets.items.any((e) => e.name == _selectedModelName)) &&
-        assets.items.isNotEmpty) {
+            !assets3d.items.any((e) => e.name == _selectedModelName)) &&
+        assets3d.items.isNotEmpty) {
       // avoid calling setState in build multiple times
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (!mounted) return;
-        setState(() => _selectedModelName = assets.items.first.name);
+        setState(() => _selectedModelName = assets3d.items.first.name);
       });
     }
 
     return Scaffold(
-      extendBodyBehindAppBar: true,
-      backgroundColor: Colors.black,
-      body: Stack(
-        children: [
-          if (_controller != null)
-            FutureBuilder(
-              future: _initializeControllerFuture,
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.done) {
-                  return CameraPreview(_controller!);
-                } else {
-                  return const Center(child: CircularProgressIndicator());
-                }
-              },
-            )
-          else
-            const Center(child: CircularProgressIndicator()),
-          const ArOverlayWidget(),
+      appBar: AppBar(
+        title: const Text('AR 3D'),
+        actions: [
+          IconButton(
+            tooltip: 'Muat ulang',
+            icon: const Icon(Icons.refresh),
+            onPressed: () => context.read<ArAssetsProvider>().refresh(),
+          ),
+        ],
+      ),
+      body: Builder(
+        builder: (context) {
+          if (assets3d.loading) {
+            return const Center(child: CircularProgressIndicator());
+          }
+          if (assets3d.error != null) {
+            return Center(
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Text(
+                  'Gagal memuat aset 3D\n${assets3d.error}',
+                  textAlign: TextAlign.center,
+                ),
+              ),
+            );
+          }
+          if (assets3d.items.isEmpty) {
+            return const Center(
+              child: Text('Tidak ada model 3D (.glb) di bucket.'),
+            );
+          }
 
-          // Model selector overlay (top)
-          SafeArea(
-            child: Padding(
-              padding: const EdgeInsets.all(12.0),
-              child: Align(
-                alignment: Alignment.topCenter,
+          return GridView.builder(
+            padding: const EdgeInsets.all(12),
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 2,
+              crossAxisSpacing: 12,
+              mainAxisSpacing: 12,
+              childAspectRatio: 0.95,
+            ),
+            itemCount: assets3d.items.length,
+            itemBuilder: (context, i) {
+              final item = assets3d.items[i];
+              return _ModelCard(
+                name: item.name,
+                thumbnailUrl: item.thumbnailUrl,
+                onOpen: () {
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (_) => ArModelViewerPage(
+                        srcUrl: item.url,
+                        title: item.name,
+                        iosSrcUrl: item.iosUrl,
+                      ),
+                    ),
+                  );
+                },
+              );
+            },
+          );
+        },
+      ),
+    );
+  }
+}
+
+class _ModelCard extends StatelessWidget {
+  final String name;
+  final String? thumbnailUrl;
+  final VoidCallback onOpen;
+  const _ModelCard({
+    required this.name,
+    required this.onOpen,
+    this.thumbnailUrl,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onOpen,
+      borderRadius: BorderRadius.circular(16),
+      child: Ink(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(16),
+          color: Theme.of(context).colorScheme.surface,
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.05),
+              blurRadius: 8,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(16),
+          child: Stack(
+            children: [
+              Positioned.fill(
+                child: thumbnailUrl != null
+                    ? Image.network(
+                        thumbnailUrl!,
+                        fit: BoxFit.cover,
+                        loadingBuilder: (c, child, progress) => progress == null
+                            ? child
+                            : Container(
+                                alignment: Alignment.center,
+                                color: Colors.grey.shade200,
+                                child: const CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                ),
+                              ),
+                        errorBuilder: (_, __, ___) => Container(
+                          color: Colors.grey.shade200,
+                          alignment: Alignment.center,
+                          child: const Icon(
+                            Icons.view_in_ar,
+                            size: 40,
+                            color: Colors.black54,
+                          ),
+                        ),
+                      )
+                    : Container(
+                        color: Colors.grey.shade200,
+                        alignment: Alignment.center,
+                        child: const Icon(
+                          Icons.view_in_ar,
+                          size: 40,
+                          color: Colors.black54,
+                        ),
+                      ),
+              ),
+              // Label gradient
+              Positioned(
+                left: 0,
+                right: 0,
+                bottom: 0,
                 child: Container(
                   padding: const EdgeInsets.symmetric(
-                    horizontal: 12,
-                    vertical: 6,
+                    horizontal: 10,
+                    vertical: 8,
                   ),
-                  decoration: BoxDecoration(
-                    color: Colors.black54,
-                    borderRadius: BorderRadius.circular(24),
+                  decoration: const BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                      colors: [Colors.transparent, Colors.black54],
+                    ),
                   ),
                   child: Row(
-                    mainAxisSize: MainAxisSize.min,
                     children: [
-                      DropdownButtonHideUnderline(
-                        child: DropdownButton<String>(
-                          value: _selectedModelName,
-                          iconEnabledColor: Colors.white,
-                          dropdownColor: Colors.black87,
-                          style: const TextStyle(color: Colors.white),
-                          hint: const Text(
-                            'Pilih model 3D',
-                            style: TextStyle(color: Colors.white70),
+                      Expanded(
+                        child: Text(
+                          name,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.w600,
                           ),
-                          items: assets.items
-                              .map(
-                                (e) => DropdownMenuItem<String>(
-                                  value: e.name,
-                                  child: Text(
-                                    e.name,
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                ),
-                              )
-                              .toList(),
-                          onChanged: (val) {
-                            setState(() => _selectedModelName = val);
-                            if (val != null) {
-                              final item = assets.items.firstWhere(
-                                (e) => e.name == val,
-                              );
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: Text('Model dipilih: ${item.name}'),
-                                ),
-                              );
-                            }
-                          },
                         ),
                       ),
                       const SizedBox(width: 8),
-                      if (assets.loading)
-                        const SizedBox(
-                          width: 18,
-                          height: 18,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2,
-                            color: Colors.white,
-                          ),
-                        )
-                      else
-                        IconButton(
-                          icon: const Icon(Icons.refresh, color: Colors.white),
-                          onPressed: () async {
-                            await context.read<ArAssetsProvider>().refresh();
-                            if (!mounted) return;
-                            if (assets.error != null) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: Text(
-                                    'Gagal memuat aset: ${assets.error}',
-                                  ),
-                                ),
-                              );
-                            } else if (assets.items.isEmpty) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                  content: Text(
-                                    'Bucket kosong atau tidak ditemukan',
-                                  ),
-                                ),
-                              );
-                            } else if (_selectedModelName == null ||
-                                !assets.items.any(
-                                  (e) => e.name == _selectedModelName,
-                                )) {
-                              setState(() {
-                                _selectedModelName = assets.items.first.name;
-                              });
-                            }
-                          },
-                        ),
-                      const SizedBox(width: 4),
-                      Text(
-                        assets.items.isEmpty
-                            ? '0 item'
-                            : '${assets.items.length} item',
-                        style: const TextStyle(
-                          color: Colors.white70,
-                          fontSize: 12,
-                        ),
+                      const Icon(
+                        Icons.play_circle_fill,
+                        color: Colors.white,
+                        size: 22,
                       ),
                     ],
                   ),
                 ),
               ),
-            ),
+            ],
           ),
-
-          // bucket status / error indicator
-          Positioned(
-            right: 8,
-            top: 8 + MediaQuery.of(context).padding.top,
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-              decoration: BoxDecoration(
-                color: Colors.black54,
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Text(
-                assets.loading
-                    ? 'Memuat…'
-                    : (assets.error != null
-                          ? 'Error aset'
-                          : (assets.bucketUsed ?? 'Bucket?')),
-                style: const TextStyle(color: Colors.white, fontSize: 12),
-              ),
-            ),
-          ),
-
-          if (!assets.loading && assets.error == null && assets.items.isEmpty)
-            Positioned(
-              top: MediaQuery.of(context).padding.top + 60,
-              left: 0,
-              right: 0,
-              child: Center(
-                child: Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 12,
-                    vertical: 8,
-                  ),
-                  decoration: BoxDecoration(
-                    color: Colors.black45,
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: const Text(
-                    'Tidak ada model .glb di bucket',
-                    style: TextStyle(color: Colors.white),
-                  ),
-                ),
-              ),
-            ),
-
-          // Tombol bawah
-          Align(
-            alignment: Alignment.bottomCenter,
-            child: SafeArea(
-              child: Padding(
-                padding: const EdgeInsets.only(bottom: 24),
-                child: ArButtonWidget(
-                  onCapture: () async {
-                    try {
-                      await _initializeControllerFuture;
-                      final image = await _controller!.takePicture();
-                      debugPrint('Foto diambil: ${image.path}');
-                    } catch (e) {
-                      debugPrint('Error ambil foto: $e');
-                    }
-                  },
-                  onSwitchCamera: () async {
-                    final newFront = !provider.isFrontCamera;
-                    await _initializeCamera(isFront: newFront);
-                  },
-                  onHelp: () {
-                    ArGuideBottomSheet.show(context);
-                  },
-                ),
-              ),
-            ),
-          ),
-
-          // Open AR viewer button (right-bottom) when a model is selected
-          if (_selectedModelName != null &&
-              assets.items.any((e) => e.name == _selectedModelName))
-            Positioned(
-              right: 16,
-              bottom: 32,
-              child: SafeArea(
-                child: FloatingActionButton.extended(
-                  onPressed: () {
-                    final item = assets.items.firstWhere(
-                      (e) => e.name == _selectedModelName,
-                      orElse: () => assets.items.first,
-                    );
-                    Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (_) => ArModelViewerPage(
-                          srcUrl: item.url,
-                          title: item.name,
-                          iosSrcUrl: item.iosUrl,
-                        ),
-                      ),
-                    );
-                  },
-                  icon: const Icon(Icons.view_in_ar),
-                  label: const Text('Lihat AR'),
-                ),
-              ),
-            ),
-        ],
+        ),
       ),
     );
   }

@@ -20,6 +20,9 @@ import 'package:budaya_indonesia/features/quiz/pages/quiz_page.dart';
 import 'package:budaya_indonesia/features/quiz/providers/quiz_provider.dart';
 import 'package:budaya_indonesia/features/splash/pages/splash_page.dart';
 import 'package:budaya_indonesia/features/ar/providers/ar_assets_provider.dart';
+import 'package:budaya_indonesia/features/ar/providers/ar2d_assets_provider.dart';
+import 'package:budaya_indonesia/features/ar/pages/ar_2d_camera_page.dart';
+import 'package:budaya_indonesia/features/ar/pages/ar_wear_body_ar_page.dart' as wear;
 import 'package:flutter/material.dart';
 
 import 'package:firebase_core/firebase_core.dart';
@@ -81,6 +84,14 @@ class _MainAppState extends State<MainApp> {
         ),
         ChangeNotifierProvider(
           create: (_) =>
+              Ar2dAssetsProvider(client: Supabase.instance.client)..refresh(),
+        ),
+        ChangeNotifierProvider(
+          create: (_) =>
+              Ar2dAssetsProvider(client: Supabase.instance.client)..refresh(),
+        ),
+        ChangeNotifierProvider(
+          create: (_) =>
               PakaianProvider(client: Supabase.instance.client)..refresh(),
         ),
         ChangeNotifierProvider(
@@ -118,6 +129,15 @@ class _MainAppState extends State<MainApp> {
                     '/profile': (context) => const ProfilePage(),
                     '/profile/edit': (context) => const EditProfilePage(),
                     '/ar': (context) => const ArPage(),
+                    '/ar/2d': (context) => const Ar2dCameraPage(),
+                    // iOS only – Android will show info stub inside the page
+                    '/ar/wear': (context) {
+                      final args = ModalRoute.of(context)!.settings.arguments
+                          as Map<String, dynamic>?;
+                      final title = args?['title'] as String? ?? 'AR Try‑On';
+                      final iosSrcUrl = args?['iosSrcUrl'] as String?;
+                      return wear.ArWearBodyArPage(title: title, iosSrcUrl: iosSrcUrl);
+                    },
                     '/quiz': (context) => const QuizPage(),
                   },
                 );

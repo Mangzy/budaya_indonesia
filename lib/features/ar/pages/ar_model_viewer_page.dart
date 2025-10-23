@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'dart:io' show Platform;
 import 'package:model_viewer_plus/model_viewer_plus.dart';
+import 'package:budaya_indonesia/features/ar/pages/ar_wear_body_ar_page.dart';
 
 class ArModelViewerPage extends StatelessWidget {
   final String srcUrl; // GLB
@@ -39,6 +40,22 @@ class ArModelViewerPage extends StatelessWidget {
             ),
         ],
       ),
+      floatingActionButton: Platform.isIOS && iosSrcUrl != null
+          ? FloatingActionButton.extended(
+              onPressed: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (_) => ArWearBodyArPage(
+                      title: title,
+                      iosSrcUrl: iosSrcUrl,
+                    ),
+                  ),
+                );
+              },
+              icon: const Icon(Icons.accessibility_new),
+              label: const Text('Try‑On (iOS)'),
+            )
+          : null,
     );
   }
 }
