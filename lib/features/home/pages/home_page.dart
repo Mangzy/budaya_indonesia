@@ -10,6 +10,9 @@ import 'package:budaya_indonesia/features/home/providers/pakaian_provider.dart';
 import 'package:budaya_indonesia/features/home/widgets/indonesia_map.dart';
 import 'package:budaya_indonesia/features/home/utils/province_svg_helper.dart';
 import 'package:budaya_indonesia/features/home/widgets/banner_slider.dart';
+import 'package:budaya_indonesia/features/quiz/providers/quiz_provider.dart';
+import 'package:budaya_indonesia/features/quiz/models/quiz_model.dart';
+import 'package:budaya_indonesia/features/quiz/pages/quiz_page.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -159,15 +162,15 @@ class _HomePageState extends State<HomePage> {
               Expanded(
                 child: _QuizCard(
                   color: const Color(0xFF15B39D),
-                  icon: Icons.people_alt,
+                  icon: Icons.checkroom,
                   title: 'Pakaian Daerah',
                   questions: 10,
                   minutes: 5,
                   onTap: () {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('Quiz Pakaian Daerah — coming soon'),
-                      ),
+                    _showQuizConfirmationDialog(
+                      context,
+                      'Quiz Pakaian Daerah',
+                      QuizCategory.pakaian,
                     );
                   },
                 ),
@@ -177,19 +180,74 @@ class _HomePageState extends State<HomePage> {
                 child: _QuizCard(
                   color: const Color(0xFF15B39D),
                   icon: Icons.music_note,
-                  title: 'Pakaian Daerah',
+                  title: 'Lagu Daerah',
                   questions: 10,
                   minutes: 5,
                   onTap: () {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('Quiz Lagu Daerah — coming soon'),
-                      ),
+                    _showQuizConfirmationDialog(
+                      context,
+                      'Quiz Lagu Daerah',
+                      QuizCategory.lagu,
                     );
                   },
                 ),
               ),
             ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showQuizConfirmationDialog(
+    BuildContext context,
+    String quizTitle,
+    QuizCategory category,
+  ) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text(
+          'Mulai $quizTitle?',
+          style: GoogleFonts.montserrat(fontWeight: FontWeight.bold),
+        ),
+        content: Text(
+          'Kamu akan mengikuti quiz dengan 10 soal dan waktu 5 menit.',
+          style: GoogleFonts.montserrat(),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: Text(
+              'Batal',
+              style: GoogleFonts.montserrat(color: Colors.grey),
+            ),
+          ),
+          ElevatedButton(
+            onPressed: () async {
+              Navigator.of(ctx).pop();
+              final quizProv = context.read<QuizProvider>();
+              try {
+                await quizProv.loadQuestions(category);
+                if (context.mounted) {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const QuizPage()),
+                  );
+                }
+              } catch (e) {
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('Gagal memulai quiz: $e')),
+                  );
+                }
+              }
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFF15B39D),
+              foregroundColor: Colors.white,
+            ),
+            child: Text('Mulai', style: GoogleFonts.montserrat()),
           ),
         ],
       ),
