@@ -12,16 +12,10 @@ class PakaianDetailPage extends StatelessWidget {
     final size = MediaQuery.of(context).size;
 
     return Scaffold(
-      backgroundColor: AppColors.tertiary,
       appBar: AppBar(
-        backgroundColor: AppColors.tertiary,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(
-            Icons.arrow_back_ios_new,
-            color: Colors.black87,
-            size: 20,
-          ),
+          icon: const Icon(Icons.arrow_back_ios_new, size: 20),
           onPressed: () => Navigator.pop(context),
         ),
         centerTitle: true,
@@ -30,7 +24,6 @@ class PakaianDetailPage extends StatelessWidget {
           style: GoogleFonts.montserrat(
             fontWeight: FontWeight.bold,
             fontSize: 18,
-            color: Colors.black,
           ),
         ),
       ),
@@ -54,15 +47,19 @@ class PakaianDetailPage extends StatelessWidget {
                   return Container(
                     height: size.height * 0.35,
                     alignment: Alignment.center,
-                    color: Colors.white,
+                    color: Theme.of(context).colorScheme.surface,
                     child: const CircularProgressIndicator(strokeWidth: 2),
                   );
                 },
                 errorBuilder: (context, error, stackTrace) => Container(
                   height: size.height * 0.35,
-                  color: Colors.grey.shade200,
+                  color: Theme.of(context).colorScheme.surfaceVariant,
                   alignment: Alignment.center,
-                  child: const Icon(Icons.image_not_supported, size: 40),
+                  child: Icon(
+                    Icons.image_not_supported,
+                    size: 40,
+                    color: Theme.of(context).iconTheme.color?.withOpacity(0.5),
+                  ),
                 ),
               ),
             ),
@@ -77,7 +74,7 @@ class PakaianDetailPage extends StatelessWidget {
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 26),
               decoration: BoxDecoration(
-                color: AppColors.secondary,
+                color: AppColors.primary,
                 borderRadius: const BorderRadius.only(
                   topLeft: Radius.circular(32),
                   topRight: Radius.circular(32),

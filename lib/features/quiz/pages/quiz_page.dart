@@ -51,20 +51,18 @@ class _QuizPageState extends State<QuizPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.tertiary,
       appBar: AppBar(
-        backgroundColor: AppColors.tertiary,
         elevation: 0,
         centerTitle: true,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.black),
+          icon: const Icon(Icons.arrow_back),
           onPressed: () => _showExitConfirmation(context),
         ),
         title: Text(
           'Quiz Budaya',
           style: GoogleFonts.montserrat(
             fontWeight: FontWeight.bold,
-            color: Colors.black,
+            fontSize: 18,
           ),
         ),
         actions: [
@@ -77,7 +75,7 @@ class _QuizPageState extends State<QuizPage> {
                   children: [
                     Icon(
                       Icons.timer,
-                      color: isWarning ? Colors.red : Colors.black,
+                      color: isWarning ? Colors.red : null,
                       size: 20,
                     ),
                     const SizedBox(width: 4),
@@ -86,7 +84,7 @@ class _QuizPageState extends State<QuizPage> {
                       style: GoogleFonts.montserrat(
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
-                        color: isWarning ? Colors.red : Colors.black,
+                        color: isWarning ? Colors.red : null,
                       ),
                     ),
                   ],
@@ -168,7 +166,6 @@ class _QuizPageState extends State<QuizPage> {
             style: GoogleFonts.montserrat(
               fontSize: 16,
               fontWeight: FontWeight.w600,
-              color: Colors.black87,
             ),
           ),
         ),
@@ -213,25 +210,26 @@ class _QuizPageState extends State<QuizPage> {
                             height: 220,
                             width: 180,
                             decoration: BoxDecoration(
-                              color: Colors.grey[200],
+                              color: Theme.of(
+                                context,
+                              ).colorScheme.surfaceVariant.withOpacity(0.3),
                               borderRadius: BorderRadius.circular(16),
                             ),
-                            child: const Center(
+                            child: Center(
                               child: Column(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
                                   Icon(
                                     Icons.image_not_supported,
                                     size: 40,
-                                    color: Colors.grey,
+                                    color: Theme.of(
+                                      context,
+                                    ).iconTheme.color?.withOpacity(0.5),
                                   ),
-                                  SizedBox(height: 6),
+                                  const SizedBox(height: 6),
                                   Text(
                                     'Gambar tidak dapat dimuat',
-                                    style: TextStyle(
-                                      color: Colors.grey,
-                                      fontSize: 12,
-                                    ),
+                                    style: GoogleFonts.montserrat(fontSize: 12),
                                   ),
                                 ],
                               ),
@@ -248,9 +246,8 @@ class _QuizPageState extends State<QuizPage> {
                 Text(
                   question.question,
                   style: GoogleFonts.montserrat(
-                    fontSize: 15,
+                    fontSize: 16,
                     fontWeight: FontWeight.w500,
-                    color: Colors.black87,
                     height: 1.4,
                   ),
                   textAlign: TextAlign.center,

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:budaya_indonesia/common/static/app_color.dart';
 
 class ProfileActionTile extends StatelessWidget {
   final IconData icon;
@@ -44,7 +45,7 @@ class EditableChip extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
         decoration: BoxDecoration(
-          color: Colors.teal.shade400,
+          color: AppColors.primary,
           borderRadius: BorderRadius.circular(30),
         ),
         child: const Text(

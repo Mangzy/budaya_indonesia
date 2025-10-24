@@ -2,6 +2,7 @@ import 'package:budaya_indonesia/features/login/pages/login_pages.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
+import 'package:budaya_indonesia/common/static/app_color.dart';
 import 'package:budaya_indonesia/src/auth_provider.dart';
 import 'package:budaya_indonesia/features/home/models/province.dart';
 import 'package:budaya_indonesia/features/home/pages/province_detail_page.dart';
@@ -161,7 +162,7 @@ class _HomePageState extends State<HomePage> {
             children: [
               Expanded(
                 child: _QuizCard(
-                  color: const Color(0xFF15B39D),
+                  color: AppColors.primary,
                   icon: Icons.checkroom,
                   title: 'Pakaian Daerah',
                   questions: 10,
@@ -178,7 +179,7 @@ class _HomePageState extends State<HomePage> {
               const SizedBox(width: 12),
               Expanded(
                 child: _QuizCard(
-                  color: const Color(0xFF15B39D),
+                  color: AppColors.primary,
                   icon: Icons.music_note,
                   title: 'Lagu Daerah',
                   questions: 10,
@@ -209,19 +210,19 @@ class _HomePageState extends State<HomePage> {
       builder: (ctx) => AlertDialog(
         title: Text(
           'Mulai $quizTitle?',
-          style: GoogleFonts.montserrat(fontWeight: FontWeight.bold),
+          style: GoogleFonts.montserrat(
+            fontWeight: FontWeight.bold,
+            fontSize: 16,
+          ),
         ),
         content: Text(
           'Kamu akan mengikuti quiz dengan 10 soal dan waktu 5 menit.',
-          style: GoogleFonts.montserrat(),
+          style: GoogleFonts.montserrat(fontSize: 13),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(),
-            child: Text(
-              'Batal',
-              style: GoogleFonts.montserrat(color: Colors.grey),
-            ),
+            child: Text('Batal', style: GoogleFonts.montserrat(fontSize: 13)),
           ),
           ElevatedButton(
             onPressed: () async {
@@ -244,10 +245,10 @@ class _HomePageState extends State<HomePage> {
               }
             },
             style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFF15B39D),
+              backgroundColor: AppColors.primary,
               foregroundColor: Colors.white,
             ),
-            child: Text('Mulai', style: GoogleFonts.montserrat()),
+            child: Text('Mulai', style: GoogleFonts.montserrat(fontSize: 13)),
           ),
         ],
       ),

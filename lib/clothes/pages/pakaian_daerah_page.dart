@@ -1,4 +1,3 @@
-import 'package:budaya_indonesia/common/static/app_color.dart';
 import 'package:budaya_indonesia/features/home/providers/pakaian_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -18,8 +17,9 @@ class _PakaianDaerahPageState extends State<PakaianDaerahPage> {
   @override
   void initState() {
     super.initState();
-    Future.microtask(() =>
-        Provider.of<PakaianProvider>(context, listen: false).refresh());
+    Future.microtask(
+      () => Provider.of<PakaianProvider>(context, listen: false).refresh(),
+    );
   }
 
   @override
@@ -33,22 +33,15 @@ class _PakaianDaerahPageState extends State<PakaianDaerahPage> {
     }).toList();
 
     return Scaffold(
-      backgroundColor: AppColors.tertiary,
       appBar: AppBar(
-        backgroundColor: AppColors.tertiary,
         elevation: 0,
         centerTitle: true,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          color: Colors.black,
-          onPressed: () => Navigator.pop(context),
-        ),
+        automaticallyImplyLeading: false,
         title: Text(
           'Pakaian Daerah',
           style: GoogleFonts.montserrat(
             fontWeight: FontWeight.bold,
             fontSize: 18,
-            color: Colors.black,
           ),
         ),
       ),
@@ -58,17 +51,23 @@ class _PakaianDaerahPageState extends State<PakaianDaerahPage> {
           children: [
             Container(
               decoration: BoxDecoration(
-                color: Colors.white,
                 borderRadius: BorderRadius.circular(24),
               ),
               child: TextField(
                 onChanged: (value) => setState(() => searchQuery = value),
-                style: const TextStyle(color: Colors.black87),
-                decoration: const InputDecoration(
+                decoration: InputDecoration(
                   hintText: 'Cari nama pakaian atau provinsi',
-                  hintStyle: TextStyle(color: Colors.black54),
-                  border: InputBorder.none,
-                  prefixIcon: Icon(Icons.search, color: Colors.black54),
+                  hintStyle: GoogleFonts.montserrat(fontSize: 13),
+                  prefixIcon: const Icon(Icons.search),
+                  filled: true,
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(24),
+                    borderSide: BorderSide.none,
+                  ),
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 12,
+                  ),
                 ),
               ),
             ),
@@ -77,18 +76,27 @@ class _PakaianDaerahPageState extends State<PakaianDaerahPage> {
               child: Builder(
                 builder: (_) {
                   if (state == LoadState.loading) {
-                    return const Center(child: CircularProgressIndicator());
+                    return Center(
+                      child: CircularProgressIndicator(
+                        color: Theme.of(context).colorScheme.primary,
+                      ),
+                    );
                   } else if (state == LoadState.error) {
                     return Center(
                       child: Text(
                         'Gagal memuat data.\n${provider.error ?? ""}',
                         textAlign: TextAlign.center,
-                        style: const TextStyle(color: Colors.red),
+                        style: TextStyle(
+                          color: Theme.of(context).colorScheme.error,
+                        ),
                       ),
                     );
                   } else if (state == LoadState.loaded && items.isEmpty) {
-                    return const Center(
-                      child: Text('Tidak ada data pakaian ditemukan.'),
+                    return Center(
+                      child: Text(
+                        'Tidak ada data pakaian ditemukan.',
+                        style: GoogleFonts.montserrat(fontSize: 14),
+                      ),
                     );
                   }
 
@@ -96,11 +104,11 @@ class _PakaianDaerahPageState extends State<PakaianDaerahPage> {
                     itemCount: items.length,
                     gridDelegate:
                         const SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 2,
-                      mainAxisSpacing: 12,
-                      crossAxisSpacing: 12,
-                      childAspectRatio: 0.7,
-                    ),
+                          crossAxisCount: 2,
+                          mainAxisSpacing: 12,
+                          crossAxisSpacing: 12,
+                          childAspectRatio: 0.7,
+                        ),
                     itemBuilder: (context, index) {
                       final pakaian = items[index];
                       return PakaianCardWidget(pakaian: pakaian);
@@ -111,7 +119,7 @@ class _PakaianDaerahPageState extends State<PakaianDaerahPage> {
             ),
           ],
         ),
-      )
+      ),
     );
   }
 }

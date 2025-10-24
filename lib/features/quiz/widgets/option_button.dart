@@ -59,9 +59,10 @@ class OptionButton extends StatelessWidget {
       textColor = Colors.white;
       trailingIcon = const Icon(Icons.check, color: Colors.white);
     } else {
-      backgroundColor = Colors.white;
-      borderColor = Colors.black;
-      textColor = Colors.black87;
+      backgroundColor = Theme.of(context).colorScheme.surface;
+      borderColor = Theme.of(context).dividerColor;
+      textColor =
+          Theme.of(context).textTheme.bodyLarge?.color ?? Colors.black87;
       trailingIcon = null;
     }
 
