@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:budaya_indonesia/common/static/app_color.dart';
 
 class PrimaryButton extends StatelessWidget {
   final VoidCallback? onPressed;
@@ -11,15 +12,14 @@ class PrimaryButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color = const Color(0xFF006F5F); // konsisten dengan desain hijau tua
     return SizedBox(
       width: double.infinity,
       child: ElevatedButton(
         onPressed: onPressed,
         style: ElevatedButton.styleFrom(
-          backgroundColor: color,
+          backgroundColor: AppColors.primary,
           // ignore: deprecated_member_use
-          disabledBackgroundColor: color.withOpacity(.4),
+          disabledBackgroundColor: AppColors.primary.withOpacity(.4),
           foregroundColor: Colors.white,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(32),

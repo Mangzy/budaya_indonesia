@@ -42,7 +42,9 @@ class ProfilePage extends StatelessWidget {
                     onTap: () => prov.updatePhoto(),
                     child: CircleAvatar(
                       radius: 40,
-                      backgroundColor: Colors.grey.shade300,
+                      backgroundColor: Theme.of(
+                        context,
+                      ).colorScheme.surfaceVariant,
                       backgroundImage:
                           (p.photoUrl != null && p.photoUrl!.startsWith('http'))
                           ? NetworkImage(p.photoUrl!)
@@ -70,10 +72,7 @@ class ProfilePage extends StatelessWidget {
                         if (p.username != null)
                           Text(
                             '@${p.username}',
-                            style: const TextStyle(
-                              fontSize: 12,
-                              color: Colors.grey,
-                            ),
+                            style: GoogleFonts.montserrat(fontSize: 12),
                           ),
                         Text(
                           p.email ?? '-',
@@ -165,7 +164,9 @@ class _EditProfilePageState extends State<EditProfilePage> {
                       children: [
                         CircleAvatar(
                           radius: 50,
-                          backgroundColor: Colors.grey.shade400,
+                          backgroundColor: Theme.of(
+                            context,
+                          ).colorScheme.surfaceVariant,
                           backgroundImage: p?.photoUrl == null
                               ? null
                               : p!.photoUrl!.startsWith('http')
@@ -188,11 +189,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                             },
                             child: const Padding(
                               padding: EdgeInsets.all(8),
-                              child: Icon(
-                                Icons.camera_alt,
-                                size: 20,
-                                color: Colors.white,
-                              ),
+                              child: Icon(Icons.camera_alt, size: 20),
                             ),
                           ),
                         ),

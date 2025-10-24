@@ -51,14 +51,11 @@ class _MusicPageState extends State<MusicPage> {
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
-        elevation: 0,
-
         title: Text(
           'Lagu Daerah',
           style: GoogleFonts.montserrat(
             fontWeight: FontWeight.bold,
             fontSize: 18,
-            color: Colors.black,
           ),
         ),
       ),
@@ -66,7 +63,6 @@ class _MusicPageState extends State<MusicPage> {
         children: [
           Container(
             padding: const EdgeInsets.all(16),
-            color: AppColors.tertiary,
             child: TextField(
               controller: _searchController,
               onChanged: (value) {
@@ -74,14 +70,11 @@ class _MusicPageState extends State<MusicPage> {
               },
               decoration: InputDecoration(
                 hintText: 'Cari nama lagu atau provinsi',
-                hintStyle: GoogleFonts.montserrat(
-                  color: Colors.grey.shade600,
-                  fontSize: 13,
-                ),
-                prefixIcon: Icon(Icons.search, color: Colors.grey.shade600),
+                hintStyle: GoogleFonts.montserrat(fontSize: 13),
+                prefixIcon: const Icon(Icons.search),
                 suffixIcon: _searchController.text.isNotEmpty
                     ? IconButton(
-                        icon: Icon(Icons.clear, color: Colors.grey.shade600),
+                        icon: const Icon(Icons.clear),
                         onPressed: () {
                           _searchController.clear();
                           context.read<MusicListProvider>().clearSearch();
@@ -89,9 +82,8 @@ class _MusicPageState extends State<MusicPage> {
                       )
                     : null,
                 filled: true,
-                fillColor: Colors.white,
                 border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(24),
                   borderSide: BorderSide.none,
                 ),
                 contentPadding: const EdgeInsets.symmetric(
@@ -114,10 +106,10 @@ class _MusicPageState extends State<MusicPage> {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        const Icon(
+                        Icon(
                           Icons.error_outline,
                           size: 64,
-                          color: Colors.red,
+                          color: Theme.of(context).colorScheme.error,
                         ),
                         const SizedBox(height: 16),
                         Text(
@@ -125,16 +117,12 @@ class _MusicPageState extends State<MusicPage> {
                           style: GoogleFonts.montserrat(
                             fontSize: 16,
                             fontWeight: FontWeight.w600,
-                            color: Colors.grey.shade800,
                           ),
                         ),
                         const SizedBox(height: 8),
                         Text(
                           provider.error ?? 'Terjadi kesalahan',
-                          style: GoogleFonts.montserrat(
-                            fontSize: 14,
-                            color: Colors.grey.shade600,
-                          ),
+                          style: GoogleFonts.montserrat(fontSize: 14),
                           textAlign: TextAlign.center,
                         ),
                         const SizedBox(height: 16),
@@ -160,7 +148,9 @@ class _MusicPageState extends State<MusicPage> {
                         Icon(
                           Icons.music_off,
                           size: 64,
-                          color: Colors.grey.shade400,
+                          color: Theme.of(
+                            context,
+                          ).iconTheme.color?.withOpacity(0.4),
                         ),
                         const SizedBox(height: 16),
                         Text(
@@ -168,10 +158,7 @@ class _MusicPageState extends State<MusicPage> {
                                   provider.searchQuery!.isNotEmpty
                               ? 'Tidak ada lagu ditemukan'
                               : 'Belum ada lagu tersedia',
-                          style: GoogleFonts.montserrat(
-                            fontSize: 16,
-                            color: Colors.grey.shade600,
-                          ),
+                          style: GoogleFonts.montserrat(fontSize: 16),
                         ),
                       ],
                     ),

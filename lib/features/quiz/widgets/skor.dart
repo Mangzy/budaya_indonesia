@@ -78,7 +78,10 @@ class _ScoreBarState extends State<ScoreBar>
                 height: 36,
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(18),
-                  border: Border.all(color: Colors.black, width: 2),
+                  border: Border.all(
+                    color: Theme.of(context).dividerColor,
+                    width: 2,
+                  ),
                 ),
                 child: Stack(
                   children: [
@@ -87,7 +90,9 @@ class _ScoreBarState extends State<ScoreBar>
                       child: LinearProgressIndicator(
                         value: value,
                         minHeight: 32,
-                        backgroundColor: Colors.white,
+                        backgroundColor: Theme.of(
+                          context,
+                        ).colorScheme.surfaceVariant,
                         valueColor: AlwaysStoppedAnimation<Color>(
                           AppColors.accent,
                         ),
@@ -100,7 +105,6 @@ class _ScoreBarState extends State<ScoreBar>
                         style: GoogleFonts.montserrat(
                           fontSize: 14,
                           fontWeight: FontWeight.bold,
-                          color: Colors.black,
                         ),
                       ),
                     ),

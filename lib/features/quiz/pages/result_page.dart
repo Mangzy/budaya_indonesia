@@ -27,7 +27,6 @@ class ResultPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.tertiary,
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
@@ -40,7 +39,6 @@ class ResultPage extends StatelessWidget {
                   style: GoogleFonts.montserrat(
                     fontSize: 32,
                     fontWeight: FontWeight.bold,
-                    color: Colors.black87,
                   ),
                 ),
                 const SizedBox(height: 16),
@@ -51,7 +49,6 @@ class ResultPage extends StatelessWidget {
                   style: GoogleFonts.montserrat(
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
-                    color: Colors.black87,
                   ),
                 ),
                 const SizedBox(height: 24),
@@ -59,9 +56,12 @@ class ResultPage extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.all(24),
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: Theme.of(context).colorScheme.surface,
                     borderRadius: BorderRadius.circular(30),
-                    border: Border.all(color: Colors.black, width: 2),
+                    border: Border.all(
+                      color: Theme.of(context).dividerColor,
+                      width: 2,
+                    ),
                     boxShadow: [
                       BoxShadow(
                         color: Colors.black.withOpacity(0.1),
@@ -74,10 +74,7 @@ class ResultPage extends StatelessWidget {
                     children: [
                       Text(
                         'Skor Anda',
-                        style: GoogleFonts.montserrat(
-                          fontSize: 18,
-                          color: Colors.black,
-                        ),
+                        style: GoogleFonts.montserrat(fontSize: 18),
                       ),
                       const SizedBox(height: 8),
                       Container(
@@ -175,24 +172,22 @@ class ResultPage extends StatelessWidget {
     required String label,
     required String value,
   }) {
-    return Row(
-      children: [
-        Icon(icon, color: iconColor, size: 28),
-        const SizedBox(width: 12),
-        Text(
-          label,
-          style: GoogleFonts.montserrat(fontSize: 16, color: Colors.black),
-        ),
-        const Spacer(),
-        Text(
-          value,
-          style: GoogleFonts.montserrat(
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
-            color: Colors.black87,
+    return Builder(
+      builder: (context) => Row(
+        children: [
+          Icon(icon, color: iconColor, size: 28),
+          const SizedBox(width: 12),
+          Text(label, style: GoogleFonts.montserrat(fontSize: 16)),
+          const Spacer(),
+          Text(
+            value,
+            style: GoogleFonts.montserrat(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }

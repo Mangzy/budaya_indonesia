@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:budaya_indonesia/common/static/app_color.dart';
 
 class RegisterPrimaryButton extends StatelessWidget {
   final VoidCallback? onPressed;
@@ -11,15 +12,14 @@ class RegisterPrimaryButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const color = Color(0xFF006F5F);
     return SizedBox(
       width: double.infinity,
       child: ElevatedButton(
         onPressed: onPressed,
         style: ElevatedButton.styleFrom(
-          backgroundColor: color,
+          backgroundColor: AppColors.primary,
           // ignore: deprecated_member_use
-          disabledBackgroundColor: color.withOpacity(.4),
+          disabledBackgroundColor: AppColors.primary.withOpacity(.4),
           foregroundColor: Colors.white,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(32),
