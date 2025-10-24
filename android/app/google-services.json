@@ -1,0 +1,54 @@
+{
+  "project_info": {
+    "project_number": "929206274027",
+    "project_id": "budaya-indonesia-34533",
+    "storage_bucket": "budaya-indonesia-34533.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:929206274027:android:b5a673d392c23da605fbae",
+        "android_client_info": {
+          "package_name": "com.example.budaya_indonesia"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "929206274027-22ldoofhhoou4c84v06gj0125ljdgj1m.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.budaya_indonesia",
+            "certificate_hash": "b9a4ff2dbf26f8c67df0d5a7d62c455f2e44d33b"
+          }
+        },
+        {
+          "client_id": "929206274027-843pkdp2p5if9an13hmk2r2nvj1a76oi.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAa01nm7_pPG991oxh1rH-UXdKfklcVuSs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "929206274027-843pkdp2p5if9an13hmk2r2nvj1a76oi.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "929206274027-dqtn8au6k461gp5screohqcouabktf7u.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.budayaIndonesia"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
