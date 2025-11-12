@@ -1,5 +1,6 @@
-import 'package:flutter/material.dart';
 import 'dart:typed_data';
+
+import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:path_drawing/path_drawing.dart';
@@ -44,6 +45,7 @@ class _IndonesiaMapState extends State<IndonesiaMap> {
   // Parsed province shapes (viewport coordinates) keyed by SVG id
   final Map<String, Path> _provincePaths = {};
   Rect? _svgViewBox; // original SVG viewBox for scaling taps
+  final TransformationController _controller = TransformationController();
 
   @override
   void initState() {
@@ -181,57 +183,66 @@ class _IndonesiaMapState extends State<IndonesiaMap> {
 
   @override
   Widget build(BuildContext context) {
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        if (_svg == null) {
-          return const Center(child: CircularProgressIndicator(strokeWidth: 2));
-        }
-        final width = constraints.maxWidth;
-        // Keep aspect ratio from viewBox if available
-        final vb = _svgViewBox ?? const Rect.fromLTWH(0, 0, 700, 300);
-        final aspect = vb.width / vb.height;
-        final height = width / aspect;
+    return InteractiveViewer(
+      transformationController: _controller,
+      minScale: 1.0,
+      maxScale: 10.0,
+      boundaryMargin: const EdgeInsets.all(150),
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          if (_svg == null) {
+            return const Center(
+              child: CircularProgressIndicator(strokeWidth: 2),
+            );
+          }
 
-        final scaleX = width / vb.width;
-        final scaleY = height / vb.height;
-        return SizedBox(
-          width: width,
-          height: height,
-          child: Stack(
-            children: [
-              // Base SVG with gesture hit-testing on path shapes
-              GestureDetector(
-                behavior: HitTestBehavior.translucent,
-                onTapDown: (details) {
-                  final local = (context.findRenderObject() as RenderBox)
-                      .globalToLocal(details.globalPosition);
-                  // Normalize to viewBox coordinates
-                  final x = local.dx / scaleX + vb.left;
-                  final y = local.dy / scaleY + vb.top;
-                  final tapPoint = Offset(x, y);
+          final width = constraints.maxWidth;
+          // Keep aspect ratio from viewBox if available
 
-                  for (final entry in _provincePaths.entries) {
-                    if (entry.value.contains(tapPoint)) {
-                      widget.onTap(entry.key);
-                      return;
+          final vb = _svgViewBox ?? const Rect.fromLTWH(0, 0, 700, 300);
+          final aspect = vb.width / vb.height;
+          final height = width / aspect;
+
+          final scaleX = width / vb.width;
+          final scaleY = height / vb.height;
+          return SizedBox(
+            width: width,
+            height: height,
+            child: Stack(
+              children: [
+                // Base SVG with gesture hit-testing on path shapes
+                GestureDetector(
+                  behavior: HitTestBehavior.translucent,
+                  onTapDown: (details) {
+                    final local = _controller.toScene(details.localPosition);
+                    // Normalize to viewBox coordinates
+                    final x = local.dx / scaleX + vb.left;
+                    final y = local.dy / scaleY + vb.top;
+                    final tapPoint = Offset(x, y);
+
+                    for (final entry in _provincePaths.entries) {
+                      if (entry.value.contains(tapPoint)) {
+                        widget.onTap(entry.key);
+                        return;
+                      }
                     }
-                  }
-                },
-                child: SvgPicture.string(
-                  _svg!,
-                  width: width,
-                  height: height,
-                  fit: BoxFit.fill,
+                  },
+                  child: SvgPicture.string(
+                    _svg!,
+                    width: width,
+                    height: height,
+                    fit: BoxFit.fill,
+                  ),
                 ),
-              ),
 
-              // Optional location markers overlay
-              if (widget.showMarkers)
-                ..._buildMarkers(width, height, vb, scaleX, scaleY),
-            ],
-          ),
-        );
-      },
+                // Optional location markers overlay
+                if (widget.showMarkers)
+                  ..._buildMarkers(width, height, vb, scaleX, scaleY),
+              ],
+            ),
+          );
+        },
+      ),
     );
   }
 
@@ -254,8 +265,7 @@ class _IndonesiaMapState extends State<IndonesiaMap> {
       if (px < 0 || py < 0 || px > width || py > height) return;
 
       final isHighlighted =
-          widget.highlightedId != null &&
-          widget.highlightedId!.toUpperCase() == id.toUpperCase();
+          widget.highlightedId?.toUpperCase() == id.toUpperCase();
       final icon =
           widget.markerBuilder?.call(id, isHighlighted) ??
           Icon(
@@ -268,16 +278,7 @@ class _IndonesiaMapState extends State<IndonesiaMap> {
         Positioned(
           left: px - widget.markerSize / 2,
           top: py - widget.markerSize / 2,
-          width: widget.markerSize,
-          height: widget.markerSize,
-          child: Material(
-            color: Colors.transparent,
-            child: InkWell(
-              customBorder: const CircleBorder(),
-              onTap: () => widget.onTap(id),
-              child: Center(child: icon),
-            ),
-          ),
+          child: GestureDetector(onTap: () => widget.onTap(id), child: icon),
         ),
       );
     });
@@ -291,12 +292,12 @@ class _IndonesiaMapState extends State<IndonesiaMap> {
     );
     final m = vbRe.firstMatch(svg);
     if (m == null) return null;
-    final left = double.tryParse(m.group(1)!);
-    final top = double.tryParse(m.group(2)!);
-    final w = double.tryParse(m.group(3)!);
-    final h = double.tryParse(m.group(4)!);
-    if (left == null || top == null || w == null || h == null) return null;
-    return Rect.fromLTWH(left, top, w, h);
+    return Rect.fromLTWH(
+      double.parse(m.group(1)!),
+      double.parse(m.group(2)!),
+      double.parse(m.group(3)!),
+      double.parse(m.group(4)!),
+    );
   }
 
   // Parse <path id="..." d="..." [transform] ...> into Flutter Path, keyed by id
