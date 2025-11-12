@@ -27,6 +27,7 @@ class QuizProvider extends ChangeNotifier {
 
   ResultState<List<QuizQuestion>> get state => _state;
   List<QuizQuestion> get questions => _questions;
+  Map<int, int> get userAnswers => Map.unmodifiable(_userAnswers);
   int get currentQuestionIndex => _currentQuestionIndex;
   bool get isQuizCompleted => _isQuizCompleted;
   QuizResult? get lastResult => _lastResult;
